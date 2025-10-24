@@ -142,13 +142,12 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-
-   .sidebar-logo {
+  .sidebar-logo {
     width: 140px;
     height: auto;
     margin: 0 auto;
     display: block;
-   }
+  }
 
   .sidebar {
     width: 220px;
@@ -172,9 +171,9 @@
 /* Small Mobile */
 @media (max-width: 480px) {
   .sidebar {
-    width: 280px;
-    min-width: 175vw;
-    max-width: 280px;
+    width: 220px;
+    min-width: 220px; /* ✅ keep consistent */
+    max-width: 220px;
   }
 
   .hamburger-btn {
