@@ -39,6 +39,10 @@
   padding: 20px 0 10px;
   border-bottom: 2px solid rgba(53, 53, 53, 0.092);
   margin-bottom: 15px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-nav {
