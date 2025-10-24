@@ -138,6 +138,14 @@
 
 /* Mobile */
 @media (max-width: 768px) {
+
+   .sidebar-logo {
+    width: 140px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+   }
+
   .sidebar {
     width: 220px;
     min-width: 220px;
