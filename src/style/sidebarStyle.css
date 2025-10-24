@@ -139,8 +139,8 @@
 /* Mobile */
 @media (max-width: 768px) {
   .sidebar {
-    width: 270px;
-    min-width: 270px;
+    width: 220px;
+    min-width: 220px;
   }
 
   .sidebar-link {
