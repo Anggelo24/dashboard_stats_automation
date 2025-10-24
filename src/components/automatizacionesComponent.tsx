@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../style/AutoStyle.css";
+import "../style/autoStyle.css";
 import { HiOutlineRefresh } from "react-icons/hi";
 
 function AutomatizacionesCom() {
