@@ -1,5 +1,4 @@
-import "../style/soporteStyle.css";
-import AutomatizacionesCom from "../components/automatizacionesComponent";
+import AutomatizacionesCom from "../components/AutomatizacionesCom";
 
 function MisAutomatizaciones() {
   return (

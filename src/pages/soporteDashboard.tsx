@@ -1,4 +1,3 @@
-import "../style/soporteStyle.css";
 import SoporteCom from "../components/soporteComponent";
 
 function Soporte() {

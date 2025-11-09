@@ -1,12 +1,68 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root {
+  /* App Colors */
+  --app-bg: #181818;
+  --app-main-bg: transparent;
+
+  /* App Spacing */
+  --app-padding-desktop: 32px;
+  --app-padding-tablet: 24px;
+  --app-padding-mobile: 16px;
+  --app-padding-small: 12px;
+
+  /* App Animations */
+  --app-animation-duration: 0.4s;
 }
 
-body {
+/* App Container */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background: var(--app-bg);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: var(--app-padding-desktop);
   overflow-x: hidden;
-  background: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  overflow-y: auto;
+  animation: fadeIn var(--app-animation-duration) ease-out;
+  background: var(--app-main-bg);
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: var(--app-padding-tablet);
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: var(--app-padding-mobile);
+    padding-top: 72px; /* Account for mobile toggle button */
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: var(--app-padding-small);
+    padding-top: 68px; /* Account for mobile toggle button */
+  }
+}

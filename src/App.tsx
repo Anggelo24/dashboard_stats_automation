@@ -3,17 +3,19 @@ import Sidebar from "./components/sidebarComponent";
 import SoporteDashboard from "./pages/soporteDashboard";
 import HomeDashboard from "./pages/homeDashboard";
 import MisAutomatizaciones from "./pages/misAutomatizaciones";
+import MiNegocioDashboard from "./pages/miNegocio";
 
 function App() {
   return (
     <Router>
-      <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div className="app-container">
         <Sidebar />
-        <main style={{ flex: 1, padding: "20px" }}>
+        <main className="main-content">
           <Routes>
             <Route path="/" element={<HomeDashboard />} />
             <Route path="/soporte" element={<SoporteDashboard />} />
             <Route path="/mis-automatizaciones" element={<MisAutomatizaciones />} />
+            <Route path="/mi-negocio" element={<MiNegocioDashboard />} />
           </Routes>
         </main>
       </div>

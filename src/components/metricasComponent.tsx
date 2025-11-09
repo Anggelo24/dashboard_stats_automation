@@ -1,407 +1,380 @@
-import React, { useState, useEffect } from 'react';
-import '../style/metricasStyle.css';
-import { HiOutlineRefresh } from "react-icons/hi";
+import React, { useState, useEffect } from "react";
+import "../style/metricas.css";
+import {
+  RefreshCcw,
+  Zap,
+  CheckCircle,
+  XCircle,
+  Clock,
+  TrendingUp,
+  Activity,
+  Loader,
+  AlertCircle,
+} from "lucide-react";
+import { n8nService } from "../services/n8nservices";
+import type { DashboardMetrics } from "../services/n8nservices";
 
-const MOCK_METRICS = {
-  overview: {
-    totalExecutions: 247,
-    successfulExecutions: 228,
-    failedExecutions: 14,
-    runningExecutions: 5,
-    successRate: 92.3
-  },
-  whatsapp: {
-    messagesSent: 189,
-    ordersProcessed: 156,
-    revenue: 12450
-  },
-  performance: {
-    avgExecutionTime: 2.4,
-    totalActiveWorkflows: 8,
-    totalWorkflows: 12
-  },
-  timeline: [
-    { date: '10/17/2025', successful: 32, failed: 2, total: 34 },
-    { date: '10/18/2025', successful: 38, failed: 1, total: 39 },
-    { date: '10/19/2025', successful: 35, failed: 3, total: 38 },
-    { date: '10/20/2025', successful: 31, failed: 2, total: 33 },
-    { date: '10/21/2025', successful: 36, failed: 2, total: 38 },
-    { date: '10/22/2025', successful: 33, failed: 3, total: 36 },
-    { date: '10/23/2025', successful: 23, failed: 1, total: 24 }
-  ],
-  recentActivity: [
-    {
-      id: 'exec_1234567890ab',
-      workflowName: 'Shopify WhatsApp Automation',
-      status: 'success',
-      startedAt: '2025-10-23T14:23:45.000Z',
-      duration: '2.3'
-    },
-    {
-      id: 'exec_2345678901bc',
-      workflowName: 'Instagram Lead Capture',
-      status: 'success',
-      startedAt: '2025-10-23T14:18:12.000Z',
-      duration: '1.8'
-    },
-    {
-      id: 'exec_3456789012cd',
-      workflowName: 'Email Campaign Sender',
-      status: 'error',
-      startedAt: '2025-10-23T14:10:33.000Z',
-      duration: '5.1'
-    },
-    {
-      id: 'exec_4567890123de',
-      workflowName: 'CRM Data Sync',
-      status: 'success',
-      startedAt: '2025-10-23T14:05:21.000Z',
-      duration: '3.2'
-    },
-    {
-      id: 'exec_5678901234ef',
-      workflowName: 'Shopify WhatsApp Automation',
-      status: 'success',
-      startedAt: '2025-10-23T13:58:45.000Z',
-      duration: '2.1'
-    }
-  ],
-  workflowStats: {
-    'Shopify WhatsApp Automation': {
-      id: 'wf_001',
-      active: true,
-      totalExecutions: 89,
-      successfulExecutions: 84,
-      failedExecutions: 5
-    },
-    'Instagram Lead Capture': {
-      id: 'wf_002',
-      active: true,
-      totalExecutions: 67,
-      successfulExecutions: 65,
-      failedExecutions: 2
-    },
-    'Email Campaign Sender': {
-      id: 'wf_003',
-      active: true,
-      totalExecutions: 45,
-      successfulExecutions: 42,
-      failedExecutions: 3
-    },
-    'CRM Data Sync': {
-      id: 'wf_004',
-      active: true,
-      totalExecutions: 34,
-      successfulExecutions: 30,
-      failedExecutions: 4
-    },
-    'Order Notification System': {
-      id: 'wf_005',
-      active: false,
-      totalExecutions: 12,
-      successfulExecutions: 12,
-      failedExecutions: 0
-    }
-  }
-};
-
-function Metricas() {
-  const [metrics, setMetrics] = useState(null);
+function MetricasCom() {
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [usingMockData, setUsingMockData] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Simular carga de datos
-  useEffect(() => {
-    const loadData = () => {
-      setLoading(true);
-      
-      // Simular delay de API
-      setTimeout(() => {
-        setMetrics(MOCK_METRICS);
-        setLastUpdate(new Date());
-        setLoading(false);
-      }, 800);
-    };
+  const fetchMetrics = async () => {
+    try {
+      setError(null);
+      const response = await n8nService.getDashboardMetrics();
 
-    loadData();
-    
-    // Auto-refresh cada 30 segundos (opcional con mock data)
-    // const interval = setInterval(loadData, 30000);
-    // return () => clearInterval(interval);
-  }, []);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Error al cargar métricas');
+      }
 
-  const refreshData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      // Simular pequeños cambios en los datos
-      const updatedMetrics = {
-        ...MOCK_METRICS,
-        overview: {
-          ...MOCK_METRICS.overview,
-          totalExecutions: MOCK_METRICS.overview.totalExecutions + Math.floor(Math.random() * 5),
-          runningExecutions: Math.floor(Math.random() * 8)
-        }
-      };
-      setMetrics(updatedMetrics);
-      setLastUpdate(new Date());
+      setMetrics(response.data);
+    } catch (err) {
+      console.error('Error fetching metrics:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
       setLoading(false);
-    }, 800);
+      setRefreshing(false);
+    }
   };
 
-  return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ textAlign: 'left', fontSize: '15px', fontWeight: '500', paddingTop: '20px',paddingBottom: '10px', color: '#111827' }}>
-          Resumen del Negocio
-          {lastUpdate && (
-            <span style={{ color: '#9ca3af', fontSize: '12px', marginLeft: '10px' }}>
-              • Actualizado: {lastUpdate.toLocaleTimeString()}
-            </span>
-          )}
-        </h1>
-        {!loading && (
-          <button onClick={refreshData} className="refresh-metrics-btn">
-            <HiOutlineRefresh />
+  useEffect(() => {
+    fetchMetrics();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchMetrics, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchMetrics();
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="metricas-container">
+        <div className="metrics-loading">
+          <Loader size={48} className="spinner" />
+          <p>Cargando métricas del dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !metrics) {
+    return (
+      <div className="metricas-container">
+        <div className="metrics-error">
+          <AlertCircle size={48} />
+          <h3>Error al cargar métricas</h3>
+          <p>{error || 'No se pudieron cargar las métricas'}</p>
+          <button onClick={handleRefresh}>
+            <RefreshCcw size={16} /> Reintentar
           </button>
-        )}
+        </div>
       </div>
-      
-      <div className='dashboard-sections'>
-        {loading && !metrics ? (
-          <div className="metrics-loading">
-            <div className="spinner"></div>
-            <p>Cargando métricas...</p>
+    );
+  }
+
+  // Preparar datos del timeline para los últimos 7 días
+  const timelineData = Object.entries(metrics.timeline).map(([date, data]) => ({
+    date,
+    ...data,
+  }));
+
+  return (
+    <div className="metricas-container-wrapper">
+      {/* Header */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <h1 className="dashboard-title">Dashboard de Métricas</h1>
+          <p className="last-update">
+            Última actualización: {formatDate(metrics.lastUpdate)}
+          </p>
+        </div>
+        <button
+          className="refresh-metrics-btn"
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          <RefreshCcw className={refreshing ? 'spinning' : ''} />
+        </button>
+      </div>
+
+      <div className="dashboard-sections">
+        {/* Main Metrics Cards */}
+        <div className="metricas-container">
+          <div className="bloque-Metricas">
+            <div className="metrica-icon" style={{ backgroundColor: '#3b82f6' }}>
+              <Zap size={24} />
+            </div>
+            <div className="metrica-content">
+              <h3 className="metrica-value">{metrics.workflows.total}</h3>
+              <p className="metrica-label">Total Workflows</p>
+              <span className="metrica-badge">
+                {metrics.workflows.active} activos
+              </span>
+            </div>
           </div>
-        ) : (
-          <>
-            <div className="metricas-container">
-              <div className="bloque-Metricas whatsapp">
-                <div className="metrica-icon">💬</div>
-                <div className="metrica-content">
-                  <h3 className="metrica-value">{metrics?.whatsapp?.messagesSent || 0}</h3>
-                  <p className="metrica-label">Mensajes WhatsApp</p>
-                  <span className="metrica-badge">Últimos 7 días</span>
+
+          <div className="bloque-Metricas">
+            <div className="metrica-icon" style={{ backgroundColor: '#10b981' }}>
+              <CheckCircle size={24} />
+            </div>
+            <div className="metrica-content">
+              <h3 className="metrica-value">{metrics.executions.successful}</h3>
+              <p className="metrica-label">Ejecuciones Exitosas</p>
+              <span className="metrica-badge">Últimos 7 días</span>
+            </div>
+          </div>
+
+          <div className="bloque-Metricas">
+            <div className="metrica-icon" style={{ backgroundColor: '#ef4444' }}>
+              <XCircle size={24} />
+            </div>
+            <div className="metrica-content">
+              <h3 className="metrica-value">{metrics.executions.failed}</h3>
+              <p className="metrica-label">Ejecuciones Fallidas</p>
+              <span className="metrica-badge">Últimos 7 días</span>
+            </div>
+          </div>
+
+          <div className="bloque-Metricas">
+            <div className="metrica-icon" style={{ backgroundColor: '#8b5cf6' }}>
+              <TrendingUp size={24} />
+            </div>
+            <div className="metrica-content">
+              <h3 className="metrica-value">{metrics.executions.successRate}%</h3>
+              <p className="metrica-label">Tasa de Éxito</p>
+              <span className="metrica-badge">Promedio general</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Execution Stats */}
+        <div className="graficas-row">
+          <div className="bloque-GraficaUno">
+            <div className="grafica-header">
+              <h3>📊 Estadísticas de Ejecución</h3>
+              <span className="live-badge">Últimos 7 días</span>
+            </div>
+            <div className="execution-stats">
+              <div className="stat-box">
+                <div className="stat-number">{metrics.executions.total}</div>
+                <div className="stat-label">Total</div>
+              </div>
+              <div className="stat-box">
+                <div className="stat-number" style={{ color: '#10b981' }}>
+                  {metrics.executions.successful}
+                </div>
+                <div className="stat-label">Exitosas</div>
+              </div>
+              <div className="stat-box">
+                <div className="stat-number" style={{ color: '#ef4444' }}>
+                  {metrics.executions.failed}
+                </div>
+                <div className="stat-label">Fallidas</div>
+              </div>
+              <div className="stat-box">
+                <div className="stat-number" style={{ color: '#f59e0b' }}>
+                  {metrics.executions.running}
+                </div>
+                <div className="stat-label">Ejecutando</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bloque-GraficaDos">
+            <div className="grafica-header">
+              <h3>⚡ Rendimiento</h3>
+            </div>
+            <div className="performance-content">
+              <div className="perf-metric">
+                <div className="perf-label">Tasa de Éxito</div>
+                <div className="perf-value">{metrics.executions.successRate}%</div>
+                <div className="perf-bar">
+                  <div
+                    className="perf-fill success-fill"
+                    style={{ width: `${metrics.executions.successRate}%` }}
+                  ></div>
                 </div>
               </div>
 
-              <div className="bloque-Metricas shopify">
-                <div className="metrica-icon">📦</div>
-                <div className="metrica-content">
-                  <h3 className="metrica-value">{metrics?.whatsapp?.ordersProcessed || 0}</h3>
-                  <p className="metrica-label">Pedidos Procesados</p>
-                  <span className="metrica-badge">Shopify</span>
+              <div className="perf-metric">
+                <div className="perf-label">Tiempo Promedio de Ejecución</div>
+                <div className="perf-value">{metrics.executions.avgExecutionTime}s</div>
+                <div className="perf-bar">
+                  <div
+                    className="perf-fill"
+                    style={{ width: '75%' }}
+                  ></div>
                 </div>
               </div>
 
-              <div className="bloque-Metricas success">
-                <div className="metrica-icon">✅</div>
-                <div className="metrica-content">
-                  <h3 className="metrica-value">{metrics?.overview?.successRate || 0}%</h3>
-                  <p className="metrica-label">Tasa de Éxito</p>
-                  <span className="metrica-badge">Workflows</span>
+              <div className="perf-metric">
+                <div className="perf-label">Workflows Activos</div>
+                <div className="perf-value">
+                  {metrics.workflows.active}/{metrics.workflows.total}
                 </div>
-              </div>
-
-              <div className="bloque-Metricas active">
-                <div className="metrica-icon">⚡</div>
-                <div className="metrica-content">
-                  <h3 className="metrica-value">{metrics?.performance?.totalActiveWorkflows || 0}</h3>
-                  <p className="metrica-label">Workflows Activos</p>
-                  <span className="metrica-badge">N8N</span>
+                <div className="perf-bar">
+                  <div
+                    className="perf-fill"
+                    style={{
+                      width: `${(metrics.workflows.active / metrics.workflows.total) * 100}%`,
+                    }}
+                  ></div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div className="graficas-row">
-              <div className="bloque-GraficaUno">
-                <div className="grafica-header">
-                  <h3>Resumen de Ejecuciones</h3>
-                  <span className="live-badge">Datos</span>
-                </div>
-                <div className="execution-stats">
-                  <div className="stat-box success-box">
-                    <div className="stat-number">{metrics?.overview?.successfulExecutions || 0}</div>
-                    <div className="stat-label">Exitosas</div>
-                  </div>
-                  <div className="stat-box error-box">
-                    <div className="stat-number">{metrics?.overview?.failedExecutions || 0}</div>
-                    <div className="stat-label">Fallidas</div>
-                  </div>
-                  <div className="stat-box running-box">
-                    <div className="stat-number">{metrics?.overview?.runningExecutions || 0}</div>
-                    <div className="stat-label">En Ejecución</div>
-                  </div>
-                  <div className="stat-box total-box">
-                    <div className="stat-number">{metrics?.overview?.totalExecutions || 0}</div>
-                    <div className="stat-label">Total</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bloque-Side">
-                <div className="grafica-header">
-                  <h3>Rendimiento</h3>
-                </div>
-                <div className="performance-content">
-                  <div className="perf-metric">
-                    <span className="perf-label">Tiempo promedio</span>
-                    <span className="perf-value">{metrics?.performance?.avgExecutionTime || 0}s</span>
-                    <div className="perf-bar">
-                      <div className="perf-fill" style={{width: '75%'}}></div>
-                    </div>
-                  </div>
-                  <div className="perf-metric">
-                    <span className="perf-label">Tasa de éxito</span>
-                    <span className="perf-value">{metrics?.overview?.successRate || 0}%</span>
-                    <div className="perf-bar">
-                      <div 
-                        className="perf-fill success-fill" 
-                        style={{width: `${metrics?.overview?.successRate || 0}%`}}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="perf-metric">
-                    <span className="perf-label">Workflows totales</span>
-                    <span className="perf-value">{metrics?.performance?.totalWorkflows || 0}</span>
-                  </div>
-                </div>
-              </div>
+        {/* Timeline */}
+        <div className="graficas-row">
+          <div className="bloque-GraficaTres">
+            <div className="grafica-header">
+              <h3>📈 Línea de Tiempo (7 días)</h3>
             </div>
+            <div className="timeline-content">
+              {timelineData.map((day) => {
+                const successWidth = day.total > 0
+                  ? (day.success / day.total) * 100
+                  : 0;
+                const failedWidth = day.total > 0
+                  ? (day.failed / day.total) * 100
+                  : 0;
 
-            <div className="graficas-row">
-              {/* GraficaDos - Actividad Reciente */}
-              <div className="bloque-GraficaDos">
-                <div className="grafica-header">
-                  <h3>Actividad Reciente</h3>
-                  <span className="count-badge">{metrics?.recentActivity?.length || 0} ejecuciones</span>
-                </div>
-                <div className="activity-list">
-                  {metrics?.recentActivity && metrics.recentActivity.length > 0 ? (
-                    metrics.recentActivity.slice(0, 5).map((activity) => (
-                      <div key={activity.id} className={`activity-row ${activity.status}`}>
-                        <div className="activity-status-icon">
-                          {activity.status === 'success' ? '✓' : 
-                           activity.status === 'error' ? '✗' : '⚡'}
-                        </div>
-                        <div className="activity-details">
-                          <strong>{activity.workflowName}</strong>
-                          <span className="activity-meta">
-                            {new Date(activity.startedAt).toLocaleTimeString('es-PA')}
-                            {activity.duration && ` • ${activity.duration}s`}
-                          </span>
-                        </div>
+                return (
+                  <div key={day.date} className="timeline-day">
+                    <div className="timeline-date">
+                      {new Date(day.date).toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: 'short',
+                      })}
+                    </div>
+                    <div className="timeline-bar-container">
+                      {day.success > 0 && (
+                        <div
+                          className="timeline-bar success"
+                          style={{ width: `${successWidth}%` }}
+                          title={`${day.success} exitosas`}
+                        ></div>
+                      )}
+                      {day.failed > 0 && (
+                        <div
+                          className="timeline-bar failed"
+                          style={{ width: `${failedWidth}%` }}
+                          title={`${day.failed} fallidas`}
+                        ></div>
+                      )}
+                    </div>
+                    <div className="timeline-count">{day.total}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Top Workflows */}
+          <div className="bloque-GraficaCuatro">
+            <div className="grafica-header">
+              <h3>🏆 Top Workflows</h3>
+              <span className="count-badge">
+                {metrics.topWorkflows.length} workflows
+              </span>
+            </div>
+            <div className="workflow-list">
+              {metrics.topWorkflows.length > 0 ? (
+                metrics.topWorkflows.map((workflow, index) => (
+                  <div key={workflow.id} className="workflow-item">
+                    <div className="workflow-rank">#{index + 1}</div>
+                    <div className="workflow-info">
+                      <strong>{workflow.name}</strong>
+                      <div className="workflow-stats">
+                        {workflow.count} ejecuciones
                       </div>
-                    ))
-                  ) : (
-                    <p className="no-data">No hay actividad reciente</p>
-                  )}
+                    </div>
+                    <div className={`workflow-status ${workflow.active ? 'active' : 'inactive'}`}>
+                      {workflow.active ? (
+                        <CheckCircle size={20} />
+                      ) : (
+                        <XCircle size={20} />
+                      )}
+                    </div>
+                    <div className="workflow-count">{workflow.count}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-data">
+                  <p>No hay datos de ejecuciones en los últimos 7 días</p>
                 </div>
-              </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-              <div className="bloque-GraficaTres">
-                <div className="grafica-header">
-                  <h3>Timeline (7 días)</h3>
-                </div>
-                <div className="timeline-content">
-                  {metrics?.timeline && metrics.timeline.length > 0 ? (
-                    metrics.timeline.slice(-7).map((day, index) => (
-                      <div key={index} className="timeline-day">
-                        <span className="timeline-date">{day.date}</span>
-                        <div className="timeline-bar-container">
-                          <div 
-                            className="timeline-bar success" 
-                            style={{width: `${(day.successful / day.total * 100)}%`}}
-                            title={`${day.successful} exitosas`}
-                          ></div>
-                          <div 
-                            className="timeline-bar failed" 
-                            style={{width: `${(day.failed / day.total * 100)}%`}}
-                            title={`${day.failed} fallidas`}
-                          ></div>
-                        </div>
-                        <span className="timeline-count">{day.total}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="no-data">Sin datos de timeline</p>
-                  )}
-                </div>
+        {/* Summary Stats */}
+        <div className="bloque-Side">
+          <div className="grafica-header">
+            <h3>📊 Resumen General</h3>
+          </div>
+          <div className="stats-summary">
+            <div className="summary-item">
+              <Activity className="summary-icon" />
+              <div className="summary-data">
+                <div className="summary-value">{metrics.workflows.total}</div>
+                <div className="summary-label">Workflows Configurados</div>
               </div>
             </div>
 
-            <div className="graficas-row">
-              <div className="bloque-GraficaCuatro">
-                <div className="grafica-header">
-                  <h3>Top Workflows</h3>
-                </div>
-                <div className="workflow-list">
-                  {metrics?.workflowStats && Object.keys(metrics.workflowStats).length > 0 ? (
-                    Object.entries(metrics.workflowStats)
-                      .sort((a, b) => b[1].totalExecutions - a[1].totalExecutions)
-                      .slice(0, 5)
-                      .map(([name, stats], index) => (
-                        <div key={name} className="workflow-item">
-                          <span className="workflow-rank">#{index + 1}</span>
-                          <div className="workflow-info">
-                            <strong>{name}</strong>
-                            <span className="workflow-stats">
-                              {stats.successfulExecutions} exitosas • {stats.failedExecutions} fallidas
-                            </span>
-                          </div>
-                          <span className={`workflow-status ${stats.active ? 'active' : 'inactive'}`}>
-                            {stats.active ? '🟢' : '🔴'}
-                          </span>
-                          <span className="workflow-count">{stats.totalExecutions}</span>
-                        </div>
-                      ))
-                  ) : (
-                    <p className="no-data">Sin estadísticas de workflows</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="bloque-GraficaCinco">
-                <div className="grafica-header">
-                  <h3>Estadísticas Generales</h3>
-                </div>
-                <div className="stats-summary">
-                  <div className="summary-item">
-                    <div className="summary-icon">🎯</div>
-                    <div className="summary-data">
-                      <span className="summary-value">{metrics?.overview?.totalExecutions || 0}</span>
-                      <span className="summary-label">Total Ejecuciones</span>
-                    </div>
-                  </div>
-                  <div className="summary-item">
-                    <div className="summary-icon">💬</div>
-                    <div className="summary-data">
-                      <span className="summary-value">{metrics?.whatsapp?.messagesSent || 0}</span>
-                      <span className="summary-label">Mensajes Enviados</span>
-                    </div>
-                  </div>
-                  <div className="summary-item">
-                    <div className="summary-icon">📦</div>
-                    <div className="summary-data">
-                      <span className="summary-value">{metrics?.whatsapp?.ordersProcessed || 0}</span>
-                      <span className="summary-label">Pedidos Completados</span>
-                    </div>
-                  </div>
-                  <div className="summary-item">
-                    <div className="summary-icon">⚡</div>
-                    <div className="summary-data">
-                      <span className="summary-value">{metrics?.performance?.totalActiveWorkflows || 0}</span>
-                      <span className="summary-label">Workflows Activos</span>
-                    </div>
-                  </div>
-                </div>
+            <div className="summary-item">
+              <CheckCircle className="summary-icon" style={{ color: '#10b981' }} />
+              <div className="summary-data">
+                <div className="summary-value">{metrics.workflows.active}</div>
+                <div className="summary-label">Workflows Activos</div>
               </div>
             </div>
-          </>
-        )}
+
+            <div className="summary-item">
+              <Clock className="summary-icon" style={{ color: '#f59e0b' }} />
+              <div className="summary-data">
+                <div className="summary-value">{metrics.workflows.paused}</div>
+                <div className="summary-label">Workflows Pausados</div>
+              </div>
+            </div>
+
+            <div className="summary-item">
+              <Zap className="summary-icon" style={{ color: '#3b82f6' }} />
+              <div className="summary-data">
+                <div className="summary-value">{metrics.executions.total}</div>
+                <div className="summary-label">Ejecuciones Totales (7d)</div>
+              </div>
+            </div>
+
+            <div className="summary-item">
+              <TrendingUp className="summary-icon" style={{ color: '#8b5cf6' }} />
+              <div className="summary-data">
+                <div className="summary-value">{metrics.executions.successRate}%</div>
+                <div className="summary-label">Tasa de Éxito Promedio</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
-export default Metricas;
+export default MetricasCom;

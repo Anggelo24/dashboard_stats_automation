@@ -1,11 +1,16 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+// Import centralized CSS structure
+import './style/theme.css'
+import './style/base.css'
+import './style/components.css'
 import App from './App.tsx'
+import { ToastProvider } from './utils/toastManager'
 
 createRoot(document.getElementById('root')!).render(
-  
   <StrictMode>
-    <App />
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </StrictMode>,
 )

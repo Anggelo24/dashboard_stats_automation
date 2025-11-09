@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "../style/soporteStyle.css";
+import "../style/soporte.css";
+import { Mail, Phone, Clock, Zap } from "lucide-react";
 
 function SoporteCom() {
   const [formData, setFormData] = useState({
@@ -151,28 +152,36 @@ function SoporteCom() {
         <h2>Información de Contacto</h2>
         <div className="contact-grid">
           <div className="contact-item">
-            <span className="contact-icon"></span>
+            <div className="contact-icon">
+              <Mail size={20} />
+            </div>
             <div>
               <strong>Email</strong>
               <p>soporteIT@tuinity.com</p>
             </div>
           </div>
           <div className="contact-item">
-            <span className="contact-icon"></span>
+            <div className="contact-icon">
+              <Phone size={20} />
+            </div>
             <div>
               <strong>Teléfono</strong>
               <p>+507 6000-0000</p>
             </div>
           </div>
           <div className="contact-item">
-            <span className="contact-icon"></span>
+            <div className="contact-icon">
+              <Clock size={20} />
+            </div>
             <div>
               <strong>Horario</strong>
               <p>Lun - Vie: 8:00 AM - 6:00 PM</p>
             </div>
           </div>
           <div className="contact-item">
-            <span className="contact-icon"></span>
+            <div className="contact-icon">
+              <Zap size={20} />
+            </div>
             <div>
               <strong>Tiempo de Respuesta</strong>
               <p>&lt; 24 horas</p>

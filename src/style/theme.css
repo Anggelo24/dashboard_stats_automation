@@ -1,0 +1,163 @@
+/* theme.css - Centralized Design Tokens */
+
+:root {
+  /* ==================== COLORS ==================== */
+
+  /* Primary Brand Colors */
+  --color-primary: #4CAF50;
+  --color-primary-light: #8BC34A;
+  --color-primary-hover: #66BB6A;
+  --color-primary-dark: #2E7D32;
+
+  --color-secondary: #6366f1;
+  --color-secondary-dark: #4f46e5;
+  --color-secondary-light: #818cf8;
+
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-success-light: #4ade80;
+  --color-success-dark: #059669;
+
+  --color-warning: #f59e0b;
+  --color-warning-light: #fbbf24;
+  --color-warning-dark: #d97706;
+
+  --color-error: #ef4444;
+  --color-error-light: #f87171;
+  --color-error-dark: #dc2626;
+
+  --color-info: #3b82f6;
+  --color-info-light: #60a5fa;
+  --color-info-dark: #2563eb;
+
+  /* Gray Scale */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Dark Theme Backgrounds */
+  --color-bg-dark-primary: #181818;
+  --color-bg-dark-secondary: #252525;
+  --color-bg-dark-tertiary: #2a2a2a;
+  --color-bg-dark-elevated: #252525;
+  --color-bg-dark-card: #252525;
+  --color-bg-dark-hover: #2d2d2d;
+
+  /* Light Theme Backgrounds */
+  --color-bg-light-primary: #ffffff;
+  --color-bg-light-secondary: #f8fafc;
+  --color-bg-light-tertiary: #f1f5f9;
+  --color-bg-light-hover: #f9fafb;
+
+  /* Text Colors - Dark Theme */
+  --color-text-dark-primary: #ffffff;
+  --color-text-dark-secondary: #b0b0b0;
+  --color-text-dark-tertiary: #888888;
+  --color-text-dark-muted: #6b7280;
+
+  /* Text Colors - Light Theme */
+  --color-text-light-primary: #1f2937;
+  --color-text-light-secondary: #4b5563;
+  --color-text-light-tertiary: #6b7280;
+  --color-text-light-muted: #9ca3af;
+
+  /* Border Colors */
+  --color-border-light: #e5e7eb;
+  --color-border-medium: #d1d5db;
+  --color-border-dark: #303030;
+
+  /* Overlay Colors */
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-overlay-light: rgba(0, 0, 0, 0.3);
+  --color-overlay-dark: rgba(0, 0, 0, 0.7);
+
+  /* ==================== SPACING ==================== */
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 30px;
+  --spacing-4xl: 40px;
+  --spacing-5xl: 60px;
+
+  /* ==================== BORDER RADIUS ==================== */
+
+  --radius-xs: 6px;
+  --radius-sm: 6px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 6px;
+  --radius-full: 12px;
+
+  /* ==================== SHADOWS ==================== */
+
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+
+  /* Dark Theme Shadows */
+  --shadow-dark-sm: none;
+  --shadow-dark-md: none;
+  --shadow-dark-lg: none;
+
+  /* ==================== TRANSITIONS ==================== */
+
+  --transition-fast: all 0.15s ease;
+  --transition-base: all 0.2s ease;
+  --transition-smooth: all 0.3s ease;
+  --transition-slow: all 0.4s ease;
+  --transition-cubic: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ==================== Z-INDEX ==================== */
+
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+
+  /* ==================== TYPOGRAPHY ==================== */
+
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'Courier New', 'Monaco', 'Menlo', monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ==================== BREAKPOINTS (for reference) ==================== */
+
+  /* Use in media queries:
+     --breakpoint-sm: 640px;
+     --breakpoint-md: 768px;
+     --breakpoint-lg: 1024px;
+     --breakpoint-xl: 1280px;
+  */
+}
