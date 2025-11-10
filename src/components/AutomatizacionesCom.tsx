@@ -29,7 +29,6 @@ interface WorkflowWithMetrics extends WorkflowSummary {
   ultimaEjecucion: string;
   ejecucionesHoy: number;
   tasaExito: number;
-  tiempoPromedio: string;
   categoria: string;
   prioridad: "alta" | "media" | "baja";
   ejecutando: boolean;
@@ -94,9 +93,19 @@ function AutomatizacionesCom() {
         throw new Error(workflowsResponse.error || 'Error al cargar workflows');
       }
 
-      // Obtener métricas para cada workflow
+      // Filtrar solo workflows que contengan "Fluffy" en el nombre o tags
+      const fluffyWorkflows = workflowsResponse.data.filter(wf => {
+        const nameHasFluffy = wf.name.toLowerCase().includes('fluffy');
+        const tagsHaveFluffy = wf.tags?.some(tag =>
+          tag.name.toLowerCase().includes('fluffy')
+        ) || false;
+
+        return nameHasFluffy || tagsHaveFluffy;
+      });
+
+      // Obtener métricas para cada workflow de Fluffy
       const workflowsWithMetrics = await Promise.all(
-        workflowsResponse.data.map(async (wf) => {
+        fluffyWorkflows.map(async (wf) => {
           try {
             const metricsResponse = await n8nService.getWorkflowMetrics(wf.id, 1); // Last day
             const metrics = metricsResponse.data?.metrics;
@@ -110,7 +119,6 @@ function AutomatizacionesCom() {
               ultimaEjecucion: metrics?.lastExecution || wf.updatedAt,
               ejecucionesHoy: metrics?.totalExecutions || 0,
               tasaExito: metrics?.successRate || 100,
-              tiempoPromedio: "N/A",
               categoria: categorizeWorkflow(wf),
               prioridad: determinePriority(metrics?.totalExecutions || 0),
               ejecutando: metrics?.lastStatus === 'running',
@@ -136,7 +144,6 @@ function AutomatizacionesCom() {
               ultimaEjecucion: wf.updatedAt,
               ejecucionesHoy: 0,
               tasaExito: 100,
-              tiempoPromedio: "N/A",
               categoria: categorizeWorkflow(wf),
               prioridad: 'baja',
               ejecutando: false,
@@ -225,7 +232,7 @@ function AutomatizacionesCom() {
     });
   };
 
-  const handleToggleWorkflow = async (workflowId: string, currentState: string) => {
+ {/*const handleToggleWorkflow = async (workflowId: string, currentState: string) => {
     try {
       if (currentState === "activo") {
         await n8nService.deactivateWorkflow(workflowId);
@@ -238,7 +245,7 @@ function AutomatizacionesCom() {
       console.error('Error toggling workflow:', err);
       alert('Error al cambiar el estado del workflow');
     }
-  };
+  };*/}
 
   const handleViewLogs = (workflow: WorkflowWithMetrics) => {
     setSelectedWorkflow(workflow);
@@ -288,16 +295,14 @@ function AutomatizacionesCom() {
       <div className="workflows-header">
         <div>
           <h1>Mis Automatizaciones</h1>
-          <p>
-            Gestiona y monitorea todos tus workflows de N8N en tiempo real
-          </p>
+          <p>Gestiona y monitorea todos tus workflows de N8N en tiempo real</p>
         </div>
-        <button 
-          className="refresh-metrics-btn" 
+        <button
+          className="refresh-metrics-btn"
           onClick={handleRefresh}
           disabled={refreshing}
         >
-          <RefreshCcw className={refreshing ? 'spinning' : ''} />
+          <RefreshCcw size={16} className={refreshing ? 'spinning' : ''} />
         </button>
       </div>
 
@@ -309,7 +314,7 @@ function AutomatizacionesCom() {
           </div>
           <div className="stat-info">
             <h3>{stats.total}</h3>
-            <p>Total Workflows</p>
+            <p>Total Automatizaciones</p>
           </div>
         </div>
         <div className="stat-card">
@@ -389,7 +394,7 @@ function AutomatizacionesCom() {
                 </span>
                 <div>
                   <h3>{workflow.nombre}</h3>
-                  <span className="workflow-id">{workflow.id}</span>
+                  <span className="workflow-id">ID: {workflow.id}</span>
                 </div>
               </div>
               <div className="workflow-badges">
@@ -436,10 +441,6 @@ function AutomatizacionesCom() {
                   {workflow.tasaExito}%
                 </span>
               </div>
-              <div className="metric-item">
-                <span className="metric-label">Tiempo Promedio</span>
-                <span className="metric-value">{workflow.tiempoPromedio}</span>
-              </div>
             </div>
 
             <div className="workflow-progress">
@@ -451,26 +452,19 @@ function AutomatizacionesCom() {
               </div>
             </div>
 
-            <div style={{ 
-              marginTop: '1rem', 
-              display: 'flex', 
-              gap: '0.5rem',
-              justifyContent: 'flex-end'
-            }}>
+            <div className="workflow-actions">
               <button
                 className="btn-modal secondary"
                 onClick={() => handleViewLogs(workflow)}
-                style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}
               >
-                Ver Logs
+                Ver Informe
               </button>
-              <button
+              {/*<button
                 className="btn-modal primary"
                 onClick={() => handleToggleWorkflow(workflow.id, workflow.estado)}
-                style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}
               >
                 {workflow.estado === 'activo' ? 'Pausar' : 'Activar'}
-              </button>
+              </button>*/}
             </div>
           </div>
         ))}
@@ -478,7 +472,7 @@ function AutomatizacionesCom() {
 
       {filteredWorkflows.length === 0 && (
         <div className="no-data">
-          <p>No hay workflows {activeFilter !== 'todos' ? activeFilter + 's' : ''}</p>
+          <p>No hay automatizaciones {activeFilter !== 'todos' ? activeFilter + 's' : ''}</p>
         </div>
       )}
 
@@ -487,7 +481,7 @@ function AutomatizacionesCom() {
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Logs: {selectedWorkflow.nombre}</h2>
+              <h2>Informe: {selectedWorkflow.nombre}</h2>
               <button className="modal-close" onClick={handleCloseModal}>
                 <X size={20} />
               </button>

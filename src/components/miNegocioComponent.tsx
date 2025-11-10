@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { googleSheetsService, DatosNegocio } from "../services/googleSheetsService";
 import { CLIENTE_CONFIG } from "../config/clienteConfig";
 import { useToast } from "../utils/toastManager";
+import { Mail, ShoppingCart, LayoutGrid, CreditCard, Share2, Lock, ClipboardList, Check, Info, Building2, ArrowRight, ArrowLeft } from "lucide-react";
 import "../style/mi-negocio.css";
 
 interface MiNegocioComponentProps {
@@ -85,7 +86,8 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
 
   const validateCurrentStep = (): boolean => {
     if (paso === 1) {
-      return !!(
+      // Validar campos básicos
+      if (!(
         formData.nombreNegocio &&
         formData.industria &&
         formData.dedicacion &&
@@ -94,7 +96,26 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
         formData.contactoEmail &&
         formData.contactoTelefono &&
         formData.contactoCargo
-      );
+      )) {
+        return false;
+      }
+
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.contactoEmail)) {
+        showToast("Por favor ingresa un email válido (ejemplo: usuario@dominio.com)", "warning");
+        return false;
+      }
+
+      // Validar formato de teléfono (permitir +, espacios, guiones y números)
+      const telefonoLimpio = formData.contactoTelefono.replace(/[\s\-\(\)]/g, '');
+      const telefonoRegex = /^[\+]?[0-9]{7,15}$/;
+      if (!telefonoRegex.test(telefonoLimpio)) {
+        showToast("Por favor ingresa un teléfono válido (ejemplo: +507 6000-0000)", "warning");
+        return false;
+      }
+
+      return true;
     }
     if (paso === 2) {
       // Validar que se haya seleccionado al menos una herramienta
@@ -150,16 +171,16 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
           return false;
         }
 
-        // Si eligió "compartir" o "agregar", necesita usuario/email
-        if ((acceso.tipoAcceso === 'compartir' || acceso.tipoAcceso === 'agregar' || acceso.tipoAcceso === 'conexion') && !acceso.cuenta) {
-          showToast(`Por favor ingresa el usuario/email de ${acceso.herramienta}`, "warning");
-          return false;
-        }
-
-        // Si eligió "compartir", necesita contraseña
-        if (acceso.tipoAcceso === 'compartir' && !acceso.contrasena) {
-          showToast(`Por favor ingresa la contraseña de ${acceso.herramienta}`, "warning");
-          return false;
+        // Si eligió "compartir", necesita usuario/email Y contraseña
+        if (acceso.tipoAcceso === 'compartir') {
+          if (!acceso.cuenta) {
+            showToast(`Por favor ingresa el usuario/email de ${acceso.herramienta}`, "warning");
+            return false;
+          }
+          if (!acceso.contrasena) {
+            showToast(`Por favor ingresa la contraseña de ${acceso.herramienta}`, "warning");
+            return false;
+          }
         }
       }
 
@@ -257,16 +278,16 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
       if (exito) {
         console.log("✅ Datos enviados exitosamente");
         showToast("¡Información enviada correctamente! Nos pondremos en contacto pronto.", "success");
-        onComplete(formData.contactoNombre); // ← NOMBRE DINÁMICO
+        onComplete(formData.contactoNombre);
       } else {
         console.log("⚠️ El servicio retornó false");
         showToast("Hubo un problema al enviar. No te preocupes, tus datos están guardados.", "warning");
-        onComplete(formData.contactoNombre); // ← NOMBRE DINÁMICO
+        onComplete(formData.contactoNombre);
       }
     } catch (error) {
       console.error("❌ Error al enviar:", error);
       showToast("Error al enviar. Tus datos están guardados de forma segura.", "error");
-      onComplete(formData.contactoNombre); // ← NOMBRE DINÁMICO
+      onComplete(formData.contactoNombre);
     } finally {
       setEnviando(false);
     }
@@ -315,16 +336,16 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
       {/* Steps Indicator */}
       <div className="steps-indicator">
         {[
-          { num: 1, label: "Información Básica", icon: "1" },
-          { num: 2, label: "Herramientas", icon: "2" },
-          { num: 3, label: "Accesos", icon: "3" },
-          { num: 4, label: "Automatizaciones", icon: "4" },
+          { num: 1, label: "Información Básica", icon: <Building2 size={20} /> },
+          { num: 2, label: "Herramientas", icon: <LayoutGrid size={20} /> },
+          { num: 3, label: "Accesos", icon: <Lock size={20} /> },
+          { num: 4, label: "Automatizaciones", icon: <ClipboardList size={20} /> },
         ].map((step, index) => (
           <div key={step.num} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
             {index > 0 && <div className="step-line"></div>}
             <div className={`step ${paso >= step.num ? "active" : ""}`}>
               <div className="step-number">
-                {paso > step.num ? "✓" : step.icon}
+                {paso > step.num ? <Check size={20} /> : step.icon}
               </div>
               <div className="step-label">{step.label}</div>
             </div>
@@ -445,6 +466,9 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
                       onChange={(e) => handleInputChange('contactoEmail', e.target.value)}
                       placeholder="juan@empresa.com"
                     />
+                    <small style={{ color: '#666', fontSize: '0.875rem' }}>
+                      Formato: usuario@dominio.com
+                    </small>
                   </div>
 
                   <div className="form-group">
@@ -456,6 +480,9 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
                       onChange={(e) => handleInputChange('contactoTelefono', e.target.value)}
                       placeholder="+507 6000-0000"
                     />
+                    <small style={{ color: '#666', fontSize: '0.875rem' }}>
+                      Incluye código de país (ej: +507)
+                    </small>
                   </div>
                 </div>
               </div>
@@ -471,7 +498,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               </p>
 
               <div className="herramientas-section">
-                <h3>📧 Email y Comunicación</h3>
+                <h3 className="section-header"><Mail size={20} /> Email y Comunicación</h3>
                 <div className="checkbox-grid">
                   {['Gmail', 'Outlook', 'Yahoo Mail', 'iCloud Mail', 'Zoho Mail', 'ProtonMail', 'Otro'].map((tool) => (
                     <label key={tool} className="checkbox-card">
@@ -499,7 +526,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               </div>
 
               <div className="herramientas-section">
-                <h3>🛒 Ventas y E-commerce</h3>
+                <h3 className="section-header"><ShoppingCart size={20} /> Ventas y E-commerce</h3>
                 <div className="checkbox-grid">
                   {['Shopify', 'WooCommerce', 'Magento', 'PrestaShop', 'WhatsApp Business', 'Telegram', 'Mercado Libre', 'Amazon', 'eBay', 'Etsy', 'Otro'].map((tool) => (
                     <label key={tool} className="checkbox-card">
@@ -527,7 +554,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               </div>
 
               <div className="herramientas-section">
-                <h3>📊 Organización y Productividad</h3>
+                <h3 className="section-header"><LayoutGrid size={20} /> Organización y Productividad</h3>
                 <div className="checkbox-grid">
                   {['Google Sheets', 'Excel', 'Airtable', 'Notion', 'Trello', 'Asana', 'Monday.com', 'ClickUp', 'Jira', 'Google Drive', 'Dropbox', 'OneDrive', 'Otro'].map((tool) => (
                     <label key={tool} className="checkbox-card">
@@ -555,7 +582,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               </div>
 
               <div className="herramientas-section">
-                <h3>💳 Pagos y Facturación</h3>
+                <h3 className="section-header"><CreditCard size={20} /> Pagos y Facturación</h3>
                 <div className="checkbox-grid">
                   {['Yappy', 'PayPal', 'Mercado Pago', 'Stripe', 'Square', 'Clover', 'QuickBooks', 'Xero', 'FreshBooks', 'Otro'].map((tool) => (
                     <label key={tool} className="checkbox-card">
@@ -583,7 +610,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               </div>
 
               <div className="herramientas-section">
-                <h3>📱 Redes Sociales y Marketing</h3>
+                <h3 className="section-header"><Share2 size={20} /> Redes Sociales y Marketing</h3>
                 <div className="checkbox-grid">
                   {['Facebook', 'Instagram', 'TikTok', 'Twitter/X', 'LinkedIn', 'YouTube', 'WhatsApp', 'Mailchimp', 'HubSpot', 'Google Ads', 'Facebook Ads', 'Otro'].map((tool) => (
                     <label key={tool} className="checkbox-card">
@@ -632,7 +659,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               </p>
 
               <div className="info-box">
-                <div className="info-icon">🔒</div>
+                <div className="info-icon"><Lock size={24} /></div>
                 <div>
                   <strong>Tu información está segura</strong>
                   <p>
@@ -657,9 +684,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
                     >
                       <option value="">Selecciona una opción...</option>
                       <option value="compartir">Puedo compartir mi usuario y contraseña</option>
-                      <option value="agregar">Prefiero agregarte como colaborador</option>
                       <option value="crear">Pueden crear una cuenta nueva para esto</option>
-                      <option value="conexion">Me gustaría conectarlo de forma segura</option>
                     </select>
                   </div>
 
@@ -672,8 +697,12 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
                           borderRadius: '8px',
                           padding: '12px 16px',
                           marginTop: '12px',
-                          color: '#4338ca'
+                          color: '#4338ca',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
                         }}>
+                          <Check size={16} />
                           <p style={{ margin: 0 }}>
                             Perfecto, crearemos una cuenta nueva para esta herramienta. No necesitas proporcionar credenciales.
                           </p>
@@ -681,7 +710,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
                       ) : (
                         <>
                           <div className="form-group">
-                            <label>Usuario o Email con el que te conectas <span className="required">*</span></label>
+                            <label>Usuario o Email <span className="required">*</span></label>
                             <input
                               type="text"
                               className="form-input"
@@ -691,18 +720,19 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
                             />
                           </div>
 
-                          {acceso.tipoAcceso === 'compartir' && (
-                            <div className="form-group">
-                              <label>Contraseña <span className="required">*</span></label>
-                              <input
-                                type="password"
-                                className="form-input"
-                                value={acceso.contrasena}
-                                onChange={(e) => actualizarAcceso(index, 'contrasena', e.target.value)}
-                                placeholder="Ingresa la contraseña"
-                              />
-                            </div>
-                          )}
+                          <div className="form-group">
+                            <label>Contraseña <span className="required">*</span></label>
+                            <input
+                              type="password"
+                              className="form-input"
+                              value={acceso.contrasena}
+                              onChange={(e) => actualizarAcceso(index, 'contrasena', e.target.value)}
+                              placeholder="Ingresa la contraseña"
+                            />
+                            <small style={{ color: 'var(--text-muted)', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Lock size={12} /> Esta información está encriptada y segura
+                            </small>
+                          </div>
                         </>
                       )}
 
@@ -782,7 +812,7 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               </div>
 
               <div className="final-info-box">
-                <div className="info-icon">📋</div>
+                <div className="info-icon"><ClipboardList size={24} /></div>
                 <div>
                   <strong>Revisión Final</strong>
                   <p>
@@ -804,16 +834,20 @@ const MiNegocioComponent = ({ onComplete }: MiNegocioComponentProps) => {
               className="btn-secondary"
               disabled={enviando}
             >
-              ← Anterior
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ArrowLeft size={16} /> Anterior
+              </span>
             </button>
           )}
           {paso < totalPasos ? (
             <button type="button" onClick={siguientePaso} className="btn-primary" disabled={enviando}>
-              Continuar →
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Continuar <ArrowRight size={14} />
+              </span>
             </button>
           ) : (
             <button type="submit" className="btn-primary" disabled={enviando}>
-              {enviando ? "Enviando..." : "Enviar ✓"}
+              {enviando ? "Enviando..." : <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Enviar <Check size={16} /></span>}
             </button>
           )}
         </div>

@@ -1,5 +1,6 @@
 // src/components/toastComponent.tsx
 import React, { useEffect } from 'react';
+import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 import '../style/toast.css';
 
 interface ToastProps {
@@ -19,17 +20,19 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration = 4000 }
   }, [duration, onClose]);
 
   const icons = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ'
+    success: <CheckCircle size={20} />,
+    error: <XCircle size={20} />,
+    warning: <AlertTriangle size={20} />,
+    info: <Info size={20} />
   };
 
   return (
     <div className={`toast toast-${type}`}>
       <div className="toast-icon">{icons[type]}</div>
       <div className="toast-message">{message}</div>
-      <button className="toast-close" onClick={onClose}>×</button>
+      <button className="toast-close" onClick={onClose}>
+        <X size={16} />
+      </button>
     </div>
   );
 };

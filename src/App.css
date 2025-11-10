@@ -1,6 +1,6 @@
 :root {
   /* App Colors */
-  --app-bg: #181818;
+  --app-bg: var(--bg-primary);
   --app-main-bg: transparent;
 
   /* App Spacing */
@@ -12,6 +12,8 @@
   /* App Animations */
   --app-animation-duration: 0.4s;
 }
+
+
 
 /* App Container */
 .app-container {

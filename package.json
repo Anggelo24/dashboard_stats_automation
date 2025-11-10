@@ -12,11 +12,16 @@
     "start": "concurrently \"npm run backend\" \"npm run dev\""
   },
   "dependencies": {
+    "@radix-ui/react-use-controllable-state": "^1.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "firebase": "^12.5.0",
+    "framer-motion": "^12.23.24",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.552.0",
+    "nodemailer": "^7.0.10",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
@@ -38,7 +43,3 @@
     "vite": "^7.1.7"
   }
 }
-  
-
-
-

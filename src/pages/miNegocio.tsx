@@ -46,7 +46,7 @@ const MiNegocioDashboard = () => {
 
   return (
     <>
-      <div className="mi-negocio-dashboard" style={{paddingTop:'80px'}}>
+      <div className="mi-negocio-dashboard" style={{paddingTop:'60px'}}>
         <div className="mi-negocio-header">
           <div className="header-content">
             <h1>Mi Negocio</h1>
@@ -81,7 +81,7 @@ const MiNegocioDashboard = () => {
                 </div>
               </div>
               <div className="completed-actions">
-                <button onClick={handleRestart} className="btn-secondary">
+                <button onClick={handleRestart} className="actualizar-btn">
                   Actualizar Información
                 </button>
               </div>

@@ -1,9 +1,26 @@
 import React, { useState } from "react";
 import "../style/soporte.css";
-import { Mail, Phone, Clock, Zap } from "lucide-react";
+
+interface FormData {
+  nombre: string;
+  email: string;
+  asunto: string;
+  prioridad: string;
+  categoria: string;
+  mensaje: string;
+}
+
+interface Ticket {
+  id: string;
+  asunto: string;
+  estado: string;
+  prioridad: string;
+  fecha: string;
+  respuesta: null | string;
+}
 
 function SoporteCom() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     nombre: "",
     email: "",
     asunto: "",
@@ -12,33 +29,60 @@ function SoporteCom() {
     mensaje: "",
   });
 
-  const handleSubmit = (e) => {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const newTicket = {
-      id: `TKT-${String(tickets.length + 1).padStart(3, "0")}`,
-      asunto: formData.asunto,
-      estado: "abierto",
-      prioridad: formData.prioridad,
-      fecha: new Date().toISOString(),
-      respuesta: null,
-    };
+    try {
+      const response = await fetch('/api/support/ticket', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    setTickets([newTicket, ...tickets]);
+      const data = await response.json();
 
-    setFormData({
-      nombre: "",
-      email: "",
-      asunto: "",
-      prioridad: "media",
-      categoria: "tecnico",
-      mensaje: "",
-    });
+      if (data.success) {
+        // Create local ticket for tracking
+        const newTicket = {
+          id: `TKT-${String(tickets.length + 1).padStart(3, "0")}`,
+          asunto: formData.asunto,
+          estado: "abierto",
+          prioridad: formData.prioridad,
+          fecha: new Date().toISOString(),
+          respuesta: null,
+        };
 
-    alert("✅ Ticket creado exitosamente!");
+        setTickets([newTicket, ...tickets]);
+
+        // Reset form
+        setFormData({
+          nombre: "",
+          email: "",
+          asunto: "",
+          prioridad: "media",
+          categoria: "tecnico",
+          mensaje: "",
+        });
+
+        alert("Ticket enviado exitosamente! Recibirás una respuesta en Soporte@tuinity.lat");
+      } else {
+        alert(data.error || "Error al enviar el ticket. Por favor intente nuevamente.");
+      }
+    } catch (error) {
+      console.error('Error submitting ticket:', error);
+      alert("Error al enviar el ticket. Por favor verifique su conexión e intente nuevamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -48,14 +92,13 @@ function SoporteCom() {
   return (
     <div className="soporte-container">
       <div className="support-header">
-        <h1>Soporte IT - Tuinity</h1>
-        <p>
-          Estamos aquí para ayudarte. Crea un ticket o consulta y te responderemos lo antes posible.
-        </p>
+        <div>
+          <h1>Soporte IT - Tuinity</h1>
+          <p>Estamos aquí para ayudarte. Crea un ticket o consulta y te responderemos lo antes posible.</p>
+        </div>
       </div>
 
-      <div className="support-grid">
-        {/* Contact Form */}
+      <div className="support-content-grid">
         <div className="support-card form-card">
           <h2>Crear Nuevo Ticket</h2>
           <form onSubmit={handleSubmit} className="support-form">
@@ -138,57 +181,49 @@ function SoporteCom() {
                 value={formData.mensaje}
                 onChange={handleChange}
                 required
-                rows="6"
+                rows={6}
                 placeholder="Proporciona todos los detalles posibles sobre tu problema..."
               ></textarea>
             </div>
 
-            <button type="submit" className="btn-submit">
-              Enviar Ticket
+            <button type="submit" className="btn-submit" disabled={isSubmitting}>
+              {isSubmitting ? "Enviando..." : "Enviar"}
             </button>
           </form>
         </div>
-        <div className="contact-info-card">
-        <h2>Información de Contacto</h2>
-        <div className="contact-grid">
-          <div className="contact-item">
-            <div className="contact-icon">
-              <Mail size={20} />
+
+        <div className="support-divider-vertical"></div>
+
+        <div className="contact-info-section">
+          <h2>Información de Contacto</h2>
+          <div className="contact-grid">
+            <div className="contact-item">
+              <div>
+                <strong>Email</strong>
+                <p>Soporte@tuinity.lat</p>
+              </div>
             </div>
-            <div>
-              <strong>Email</strong>
-              <p>soporteIT@tuinity.com</p>
+            <div className="contact-item">
+              <div>
+                <strong>Teléfono</strong>
+                <p>+507 6812-3708</p>
+                <p>+57 310 454425</p>
+              </div>
             </div>
-          </div>
-          <div className="contact-item">
-            <div className="contact-icon">
-              <Phone size={20} />
+            <div className="contact-item">
+              <div>
+                <strong>Horario</strong>
+                <p>Lun - Vie: 8:00 AM - 6:00 PM</p>
+              </div>
             </div>
-            <div>
-              <strong>Teléfono</strong>
-              <p>+507 6000-0000</p>
-            </div>
-          </div>
-          <div className="contact-item">
-            <div className="contact-icon">
-              <Clock size={20} />
-            </div>
-            <div>
-              <strong>Horario</strong>
-              <p>Lun - Vie: 8:00 AM - 6:00 PM</p>
-            </div>
-          </div>
-          <div className="contact-item">
-            <div className="contact-icon">
-              <Zap size={20} />
-            </div>
-            <div>
-              <strong>Tiempo de Respuesta</strong>
-              <p>&lt; 24 horas</p>
+            <div className="contact-item">
+              <div>
+                <strong>Tiempo de Respuesta</strong>
+                <p>&lt; 24 horas</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

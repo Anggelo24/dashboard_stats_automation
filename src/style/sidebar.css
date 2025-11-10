@@ -2,15 +2,16 @@
 
 .sidebar {
   width: 260px;
-  background: var(--color-bg-dark-secondary);
+  background: var(--bg-secondary);
   height: 100vh;
   position: sticky;
   top: 0;
   left: 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--color-border-dark);
+  border-right: 1px solid var(--border-color);
   z-index: var(--z-sticky);
+  transition: background-color 0.3s ease;
 }
 
 /* ==================== LOGO ==================== */
@@ -21,10 +22,12 @@
   justify-content: center;
   padding: var(--spacing-2xl);
   margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
 }
 
 .sidebar-logo-container img {
-  width: 90px;
+  width: 120px;
   margin-top: var(--spacing-2xl);
   margin-bottom: var(--spacing-lg);
 }
@@ -32,7 +35,8 @@
 /* ==================== NAVIGATION ==================== */
 
 .sidebar-nav {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 0 var(--spacing-md);
   overflow-y: auto;
 }
@@ -44,7 +48,7 @@
   padding: var(--spacing-md) var(--spacing-md);
   margin-bottom: var(--spacing-md);
   border-radius: var(--radius-sm);
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
   text-decoration: none;
   cursor: pointer;
   font-size: var(--font-size-sm);
@@ -54,18 +58,18 @@
 }
 
 .sidebar-item:hover {
-  background: #2d2d2d;
-  color: var(--color-text-dark-secondary);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
 }
 
 .sidebar-item.active {
-  background: #2d2d2d;
-  color: var(--color-text-dark-primary);
+  background: var(--bg-hover);
+  color: var(--text-primary);
   border-color: transparent;
 }
 
 .sidebar-item.active:hover {
-  background: #323232;
+  background: var(--bg-tertiary);
 }
 
 .sidebar-icon {
@@ -93,19 +97,32 @@
 
 .sidebar-footer {
   padding: var(--spacing-lg);
-  border-top: 1px solid var(--color-border-dark);
+  border-top: 1px solid var(--border-color);
   text-align: center;
+  flex-shrink: 0;
+  margin-top: auto;
+  min-height: fit-content;
 }
 
 .sidebar-footer-text {
   font-size: var(--font-size-xs);
-  color: var(--color-text-dark-muted);
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 600;
   margin: 0;
 }
 
+
 .tuinity-brand {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-secondary);
+  font-family: 'Glitz', sans-serif !important;  /* ← Agrega comillas */
+  font-weight: normal !important;  /* ← CAMBIA A NORMAL */
+  font-size: x-large;
+  color: rgba(136, 136, 136, 0.338) !important;  /* Light gray for dark mode */
+  transition: color 0.3s ease;
+}
+
+/* Light mode: keep dark gray */
+:root[data-theme="light"] .tuinity-brand {
+  color: rgba(0, 0, 0, 0.35);
 }
 
 /* ==================== MOBILE ==================== */
@@ -113,17 +130,18 @@
 .sidebar-mobile-toggle {
   display: none;
   position: fixed;
-  top: var(--spacing-lg);
-  left: var(--spacing-lg);
+  top: 12px;
+  left: 12px;
   z-index: calc(var(--z-sticky) + 1);
   width: 44px;
   height: 44px;
   border-radius: var(--radius-sm);
-  background: var(--color-bg-dark-secondary);
-  border: 1px solid var(--color-border-dark);
-  color: var(--color-text-dark-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   font-size: 22px;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-overlay {
@@ -139,6 +157,7 @@
 @media (max-width: 1024px) {
   .sidebar {
     width: 240px;
+    height: 100vh;
   }
 
   .sidebar-logo-container img {
@@ -193,6 +212,10 @@
   .sidebar-footer {
     padding: var(--spacing-md);
   }
+
+  .sidebar-nav {
+    max-height: calc(100vh - 280px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -204,6 +227,8 @@
     width: 40px;
     height: 40px;
     font-size: 20px;
+    top: 8px;
+    left: 8px;
   }
 
   .sidebar-logo-container {
@@ -216,15 +241,15 @@
   }
 
   .sidebar-item {
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
     gap: var(--spacing-sm);
     font-size: var(--font-size-xs);
   }
 
   .sidebar-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 
   .sidebar-footer {
@@ -233,6 +258,10 @@
 
   .sidebar-footer-text {
     font-size: 10px;
+  }
+
+  .sidebar-nav {
+    max-height: calc(100vh - 250px);
   }
 }
 
@@ -243,10 +272,10 @@
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
-  background: var(--color-border-dark);
+  background: var(--scrollbar-thumb);
   border-radius: var(--radius-sm);
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: var(--color-bg-dark-hover);
+  background: var(--scrollbar-thumb-hover);
 }

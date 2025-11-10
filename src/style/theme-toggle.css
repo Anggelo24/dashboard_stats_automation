@@ -1,0 +1,99 @@
+/* theme-toggle.css - Horizontal Theme Switcher */
+
+.theme-switcher-horizontal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  margin: var(--spacing-md) auto;
+  width: fit-content;
+}
+
+.theme-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  z-index: 1;
+}
+
+.theme-button:hover {
+  color: var(--text-secondary);
+}
+
+.theme-button.active {
+  color: var(--text-primary);
+}
+
+.theme-button-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-card);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: -1;
+}
+
+.theme-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.theme-button:hover .theme-icon {
+  transform: scale(1.1);
+}
+
+.theme-button.active .theme-icon {
+  color: var(--color-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .theme-switcher-horizontal {
+    margin: var(--spacing-sm) auto;
+    padding: 3px;
+  }
+
+  .theme-button {
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+  }
+
+  .theme-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-switcher-horizontal {
+    padding: 2px;
+  }
+
+  .theme-button {
+    width: 32px;
+    height: 32px;
+    padding: 7px;
+  }
+
+  .theme-icon {
+    width: 16px;
+    height: 16px;
+  }
+}

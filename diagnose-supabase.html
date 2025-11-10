@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Supabase Diagnostics</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .section {
+      background: #2a2a2a;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border-left: 4px solid #6366f1;
+    }
+    button {
+      background: #6366f1;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #5558e3;
+    }
+    .result {
+      background: #1a1a1a;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .success { border-left: 4px solid #10b981; }
+    .error { border-left: 4px solid #ef4444; }
+    .warning { border-left: 4px solid #f59e0b; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Supabase Connection Diagnostics</h1>
+
+  <div class="section">
+    <h2>Configuration</h2>
+    <div class="result">
+URL: https://cdgolvcyibkdcpoqbifv.supabase.co
+Client ID: 2e75e60c-2362-42d1-8300-225944efb8db
+Table: workflow_executions
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Tests</h2>
+    <button onclick="testConnection()">1. Test Supabase Connection</button>
+    <button onclick="testTableAccess()">2. Test Table Access</button>
+    <button onclick="testClientData()">3. Test Client Data</button>
+    <button onclick="testAllTables()">4. List All Tables</button>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://cdgolvcyibkdcpoqbifv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZ29sdmN5aWJrZGNwb3FiaWZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MjY0OTIsImV4cCI6MjA3ODMwMjQ5Mn0.7rxnYNKDakBuvG_11KIsalGlgSJI4fyqjbbq79k-FbY';
+    const CLIENT_ID = '2e75e60c-2362-42d1-8300-225944efb8db';
+
+    function log(message, type = 'result') {
+      const div = document.createElement('div');
+      div.className = `result ${type}`;
+      div.textContent = message;
+      document.getElementById('results').appendChild(div);
+    }
+
+    async function testConnection() {
+      document.getElementById('results').innerHTML = '';
+      log('🔄 Testing Supabase connection...', 'result');
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          }
+        });
+
+        if (response.ok) {
+          log('✅ SUCCESS: Supabase connection works!', 'success');
+          log(`Status: ${response.status}`, 'success');
+        } else {
+          const text = await response.text();
+          log(`❌ ERROR: Connection failed\nStatus: ${response.status}\nResponse: ${text}`, 'error');
+        }
+      } catch (error) {
+        log(`❌ ERROR: ${error.message}`, 'error');
+      }
+    }
+
+    async function testTableAccess() {
+      document.getElementById('results').innerHTML = '';
+      log('🔄 Testing workflow_executions table access...', 'result');
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/workflow_executions?limit=1`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          log('✅ SUCCESS: Table exists and is accessible!', 'success');
+          log(`Records found: ${data.length}`, 'success');
+          if (data.length > 0) {
+            log(`Sample record:\n${JSON.stringify(data[0], null, 2)}`, 'success');
+          } else {
+            log('⚠️ WARNING: Table is empty!', 'warning');
+          }
+        } else {
+          const text = await response.text();
+          log(`❌ ERROR: Cannot access table\nStatus: ${response.status}\nResponse: ${text}`, 'error');
+
+          if (response.status === 404) {
+            log('💡 The table "workflow_executions" does not exist in your database.', 'error');
+          } else if (response.status === 401 || response.status === 403) {
+            log('💡 Permission denied. Check Row-Level Security (RLS) policies.', 'error');
+          }
+        }
+      } catch (error) {
+        log(`❌ ERROR: ${error.message}`, 'error');
+      }
+    }
+
+    async function testClientData() {
+      document.getElementById('results').innerHTML = '';
+      log(`🔄 Testing data for client: ${CLIENT_ID}...`, 'result');
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/workflow_executions?client_id=eq.${CLIENT_ID}&limit=10`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length > 0) {
+            log(`✅ SUCCESS: Found ${data.length} records for Fluffy!`, 'success');
+            log(`Sample records:\n${JSON.stringify(data, null, 2)}`, 'success');
+          } else {
+            log('⚠️ WARNING: No data found for this client ID!', 'warning');
+            log('💡 Solution: You need to insert workflow execution data into Supabase.', 'warning');
+          }
+        } else {
+          const text = await response.text();
+          log(`❌ ERROR: ${response.status}\n${text}`, 'error');
+        }
+      } catch (error) {
+        log(`❌ ERROR: ${error.message}`, 'error');
+      }
+    }
+
+    async function testAllTables() {
+      document.getElementById('results').innerHTML = '';
+      log('🔄 Attempting to discover tables...', 'result');
+
+      const commonTables = ['clients', 'workflow_executions', 'users', 'executions'];
+
+      for (const table of commonTables) {
+        try {
+          const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?limit=1`, {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            log(`✅ Table "${table}" exists (${data.length} records found)`, 'success');
+          } else if (response.status === 404) {
+            log(`❌ Table "${table}" does not exist`, 'error');
+          } else {
+            log(`⚠️ Table "${table}" exists but access denied (status: ${response.status})`, 'warning');
+          }
+        } catch (error) {
+          log(`❌ Error checking "${table}": ${error.message}`, 'error');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

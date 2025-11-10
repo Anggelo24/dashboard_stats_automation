@@ -2,6 +2,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -18,6 +19,17 @@ app.use(express.json());
 // N8N Configuration
 const N8N_BASE_URL = process.env.N8N_BASE_URL;
 const N8N_API_KEY = process.env.N8N_API_KEY;
+
+// Email Configuration
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.EMAIL_PORT || '587'),
+  secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
 
 // Helper function to make N8N API calls
 async function n8nRequest(endpoint, options = {}) {
@@ -206,12 +218,12 @@ app.get('/api/executions/:id', async (req, res) => {
 // Get dashboard metrics
 app.get('/api/metrics/dashboard', async (req, res) => {
   try {
-    // Get workflows summary
-    const workflowsData = await n8nRequest('/workflows?limit=1000');
+    // Get workflows summary (N8N max limit is 250)
+    const workflowsData = await n8nRequest('/workflows?limit=250');
     const workflows = workflowsData.data;
 
-    // Get recent executions (last 7 days)
-    const executions = await n8nRequest('/executions?limit=1000&includeData=false');
+    // Get recent executions (last 7 days, N8N max limit is 250)
+    const executions = await n8nRequest('/executions?limit=250&includeData=false');
     
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -226,24 +238,46 @@ app.get('/api/metrics/dashboard', async (req, res) => {
     const activeWorkflows = workflows.filter(w => w.active).length;
     const pausedWorkflows = workflows.filter(w => !w.active).length;
 
-    const successfulExecutions = recentExecutions.filter(e => e.finished && !e.stoppedAt).length;
-    const failedExecutions = recentExecutions.filter(e => e.stoppedAt && e.stoppedAt !== null).length;
-    const runningExecutions = recentExecutions.filter(e => !e.finished).length;
+    // Determine execution status correctly
+    const successfulExecutions = recentExecutions.filter(e => {
+      if (e.status === 'success') return true;
+      if (e.status === 'error') return false;
+      return e.finished && e.stoppedAt && !e.waitTill;
+    }).length;
+
+    const failedExecutions = recentExecutions.filter(e => {
+      if (e.status === 'error') return true;
+      return false;
+    }).length;
+
+    const runningExecutions = recentExecutions.filter(e => {
+      if (e.status === 'running' || e.status === 'waiting') return true;
+      return !e.finished;
+    }).length;
 
     const totalExecutions = recentExecutions.length;
-    const successRate = totalExecutions > 0 
+    const successRate = totalExecutions > 0
       ? ((successfulExecutions / totalExecutions) * 100).toFixed(1)
       : 0;
 
     // Calculate average execution time (in seconds)
-    const completedExecutions = recentExecutions.filter(e => e.finished && e.startedAt && e.stoppedAt);
-    const avgExecutionTime = completedExecutions.length > 0
-      ? completedExecutions.reduce((acc, exec) => {
-          const start = new Date(exec.startedAt);
-          const end = new Date(exec.stoppedAt);
-          return acc + (end - start) / 1000;
-        }, 0) / completedExecutions.length
-      : 0;
+    const completedExecutions = recentExecutions.filter(e => {
+      // Include executions that are explicitly successful OR finished with both timestamps
+      const isSuccess = e.status === 'success';
+      const isFinished = e.finished && e.stoppedAt;
+      return (isSuccess || isFinished) && e.startedAt && e.stoppedAt;
+    });
+
+    let avgExecutionTime = "n/a";
+    if (completedExecutions.length > 0) {
+      const totalTime = completedExecutions.reduce((acc, exec) => {
+        const start = new Date(exec.startedAt).getTime();
+        const end = new Date(exec.stoppedAt).getTime();
+        const duration = (end - start) / 1000; // convert to seconds
+        return acc + duration;
+      }, 0);
+      avgExecutionTime = (totalTime / completedExecutions.length).toFixed(2);
+    }
 
     // Get executions by day for the last 7 days
     const executionsByDay = {};
@@ -262,9 +296,9 @@ app.get('/api/metrics/dashboard', async (req, res) => {
       const dateKey = new Date(exec.startedAt).toISOString().split('T')[0];
       if (executionsByDay[dateKey]) {
         executionsByDay[dateKey].total++;
-        if (exec.finished && !exec.stoppedAt) {
+        if (exec.status === 'success' || (exec.finished && exec.stoppedAt && !exec.waitTill)) {
           executionsByDay[dateKey].success++;
-        } else if (exec.stoppedAt) {
+        } else if (exec.status === 'error') {
           executionsByDay[dateKey].failed++;
         }
       }
@@ -307,7 +341,7 @@ app.get('/api/metrics/dashboard', async (req, res) => {
           failed: failedExecutions,
           running: runningExecutions,
           successRate: parseFloat(successRate),
-          avgExecutionTime: avgExecutionTime.toFixed(2)
+          avgExecutionTime: avgExecutionTime
         },
         timeline: executionsByDay,
         topWorkflows,
@@ -332,9 +366,9 @@ app.get('/api/metrics/workflow/:id', async (req, res) => {
     // Get workflow details
     const workflow = await n8nRequest(`/workflows/${id}`);
     
-    // Get workflow executions
+    // Get workflow executions (N8N max limit is 250)
     const executions = await n8nRequest(
-      `/executions?workflowId=${id}&limit=1000&includeData=false`
+      `/executions?workflowId=${id}&limit=250&includeData=false`
     );
 
     const now = new Date();
@@ -345,8 +379,17 @@ app.get('/api/metrics/workflow/:id', async (req, res) => {
       return execDate >= daysAgo;
     });
 
-    const successfulExecutions = recentExecutions.filter(e => e.finished && !e.stoppedAt).length;
-    const failedExecutions = recentExecutions.filter(e => e.stoppedAt && e.stoppedAt !== null).length;
+    // Determine execution status correctly using N8N status field
+    const successfulExecutions = recentExecutions.filter(e => {
+      if (e.status === 'success') return true;
+      if (e.status === 'error') return false;
+      return e.finished && e.stoppedAt && !e.waitTill;
+    }).length;
+
+    const failedExecutions = recentExecutions.filter(e => {
+      if (e.status === 'error') return true;
+      return false;
+    }).length;
 
     const successRate = recentExecutions.length > 0
       ? ((successfulExecutions / recentExecutions.length) * 100).toFixed(1)
@@ -354,10 +397,22 @@ app.get('/api/metrics/workflow/:id', async (req, res) => {
 
     // Get latest execution
     const latestExecution = recentExecutions.length > 0
-      ? recentExecutions.sort((a, b) => 
+      ? recentExecutions.sort((a, b) =>
           new Date(b.startedAt) - new Date(a.startedAt)
         )[0]
       : null;
+
+    // Determine last execution status
+    let lastStatus = 'success';
+    if (latestExecution) {
+      if (latestExecution.status) {
+        lastStatus = latestExecution.status;
+      } else if (!latestExecution.finished) {
+        lastStatus = latestExecution.waitTill ? 'waiting' : 'running';
+      } else if (latestExecution.finished) {
+        lastStatus = 'success';
+      }
+    }
 
     res.json({
       success: true,
@@ -374,18 +429,14 @@ app.get('/api/metrics/workflow/:id', async (req, res) => {
           failed: failedExecutions,
           successRate: parseFloat(successRate),
           lastExecution: latestExecution?.startedAt || null,
-          lastStatus: latestExecution?.finished 
-            ? (latestExecution.stoppedAt ? 'failed' : 'success')
-            : 'running'
+          lastStatus: lastStatus
         },
         recentExecutions: recentExecutions.slice(0, 10).map(exec => ({
           id: exec.id,
           startedAt: exec.startedAt,
           stoppedAt: exec.stoppedAt,
           finished: exec.finished,
-          status: exec.finished 
-            ? (exec.stoppedAt ? 'error' : 'success')
-            : 'running'
+          status: exec.status || (exec.finished ? 'success' : (exec.waitTill ? 'waiting' : 'running'))
         }))
       }
     });
@@ -394,6 +445,89 @@ app.get('/api/metrics/workflow/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message
+    });
+  }
+});
+
+// ==================== SUPPORT TICKET ENDPOINT ====================
+
+app.post('/api/support/ticket', async (req, res) => {
+  try {
+    const { nombre, email, asunto, prioridad, categoria, mensaje } = req.body;
+
+    // Validate required fields
+    if (!nombre || !email || !asunto || !mensaje) {
+      return res.status(400).json({
+        success: false,
+        error: 'Todos los campos son requeridos'
+      });
+    }
+
+    // Create email content
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'Soporte@tuinity.lat',
+      subject: `[${categoria.toUpperCase()}] [${prioridad.toUpperCase()}] ${asunto}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #6366f1; border-bottom: 2px solid #6366f1; padding-bottom: 10px;">
+            Nuevo Ticket de Soporte
+          </h2>
+
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 5px 0;"><strong>Nombre:</strong> ${nombre}</p>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+            <p style="margin: 5px 0;"><strong>Categoría:</strong> ${categoria}</p>
+            <p style="margin: 5px 0;"><strong>Prioridad:</strong> ${prioridad}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333;">Asunto:</h3>
+            <p style="color: #666;">${asunto}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333;">Descripción:</h3>
+            <p style="color: #666; white-space: pre-line;">${mensaje}</p>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Este ticket fue enviado desde el Dashboard de Tuinity
+          </p>
+        </div>
+      `,
+      text: `
+Nuevo Ticket de Soporte
+
+Nombre: ${nombre}
+Email: ${email}
+Categoría: ${categoria}
+Prioridad: ${prioridad}
+
+Asunto: ${asunto}
+
+Descripción:
+${mensaje}
+
+---
+Este ticket fue enviado desde el Dashboard de Tuinity
+      `
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    res.json({
+      success: true,
+      message: 'Ticket enviado exitosamente'
+    });
+  } catch (error) {
+    console.error('Error sending support ticket:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al enviar el ticket. Por favor intente nuevamente.'
     });
   }
 });

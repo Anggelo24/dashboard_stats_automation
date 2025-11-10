@@ -17,13 +17,13 @@
 .workflows-header h1 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-dark-primary);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .workflows-header p {
   font-size: 10px;
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
   margin: var(--spacing-xs) 0 0 0;
 }
 
@@ -37,8 +37,8 @@
 }
 
 .stat-card {
-  background: var(--color-bg-dark-secondary);
-  border: 1px solid var(--color-border-dark);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: var(--spacing-lg);
   display: flex;
@@ -53,11 +53,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-dark-secondary);
+  color: var(--text-secondary);
 }
 
 .stat-icon.total {
-  color: var(--color-text-dark-secondary);
+  color: var(--text-secondary);
 }
 
 .stat-icon.active {
@@ -75,13 +75,13 @@
 .stat-info h3 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  color: var(--color-text-dark-primary);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .stat-info p {
   font-size: 10px;
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -98,9 +98,9 @@
 
 .filter-btn {
   padding: var(--spacing-sm) var(--spacing-lg);
-  background: var(--color-bg-dark-secondary);
-  color: var(--color-text-dark-secondary);
-  border: 1px solid var(--color-border-dark);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: var(--font-size-xs);
@@ -109,7 +109,7 @@
 }
 
 .filter-btn.active {
-  background: var(--color-secondary);
+  background: #4891ff;
   color: white;
   border-color: var(--color-secondary);
 }
@@ -123,11 +123,10 @@
 }
 
 .workflow-card {
-  background: var(--color-bg-dark-secondary);
-  border: 1px solid var(--color-border-dark);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: var(--spacing-lg);
-  cursor: pointer;
 }
 
 .workflow-card.status-active {
@@ -164,19 +163,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-dark-secondary);
+  color: var(--text-secondary);
 }
 
 .workflow-title-group h3 {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-dark-primary);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .workflow-id {
   font-size: 10px;
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
   margin-top: var(--spacing-xs);
 }
 
@@ -198,41 +197,39 @@
 }
 
 .badge-active {
-  background: var(--color-success);
-  color: white;
+  background: #10b981 !important;
+  color: white !important;
 }
 
 .badge-paused {
-  background: var(--color-warning);
-  color: white;
+  background: #f59e0b !important;
+  color: white !important;
 }
 
 .badge-error {
-  background: var(--color-error);
-  color: white;
+  background: #ef4444 !important;
+  color: white !important;
 }
 
 .priority-high {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgb(255, 71, 71) !important;
+  color: #ffffff !important;
+  font-weight: var(--font-weight-bold) !important;
 }
 
 .priority-medium {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fcd34d;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: rgba(234, 179, 8, 0.15);
+  color: #fde047;
 }
 
 .priority-low {
-  background: rgba(59, 130, 246, 0.2);
-  color: #93c5fd;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(72, 145, 255, 0.15) !important;
+  color: #4891ff !important;
 }
 
 .workflow-description {
   font-size: var(--font-size-xs);
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
   line-height: 1.5;
   margin-bottom: var(--spacing-md);
   min-height: 40px;
@@ -242,10 +239,10 @@
 
 .workflow-metrics {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
   padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border-dark);
+  border-top: 1px solid var(--border-color);
 }
 
 .workflow-metric {
@@ -256,12 +253,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  align-items: center;
+  text-align: center;
 }
 
 .metric-value {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-dark-primary);
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -271,7 +270,7 @@
 
 .metric-label {
   font-size: 10px;
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -288,7 +287,7 @@
 .progress-bar {
   width: 100%;
   height: 4px;
-  background: var(--color-bg-dark-tertiary);
+  background: var(--bg-tertiary);
   border-radius: var(--radius-full);
   overflow: hidden;
 }
@@ -298,6 +297,21 @@
   background: linear-gradient(90deg, var(--color-success) 0%, #10b981 100%);
   border-radius: var(--radius-full);
   transition: width 0.3s ease;
+}
+
+/* ==================== WORKFLOW ACTIONS ==================== */
+
+.workflow-actions {
+  margin-top: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+}
+
+.workflow-actions .btn-modal {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  min-height: 32px;
 }
 
 /* ==================== MODAL ==================== */
@@ -314,7 +328,7 @@
 }
 
 .modal-content {
-  background: var(--color-bg-dark-secondary);
+  background: var(--bg-secondary);
   border-radius: var(--radius-md);
   max-width: 600px;
   width: 90%;
@@ -326,7 +340,7 @@
 
 .modal-header {
   padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border-dark);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -335,14 +349,14 @@
 .modal-header h2 {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-dark-primary);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .modal-close {
   background: none;
   border: none;
-  color: var(--color-text-dark-secondary);
+  color: var(--text-secondary);
   font-size: 24px;
   cursor: pointer;
   padding: 0;
@@ -362,10 +376,18 @@
 
 .modal-footer {
   padding: var(--spacing-lg);
-  border-top: 1px solid var(--color-border-dark);
+  border-top: 1px solid var(--border-color);
   display: flex;
   gap: var(--spacing-md);
-  justify-content: flex-end;
+  justify-content: flex-start;
+}
+
+.modal-footer .btn-modal {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  min-height: 32px;
+  width: auto;
+  flex: 0 0 auto;
 }
 
 .btn-modal {
@@ -386,9 +408,8 @@
 }
 
 .btn-modal.secondary {
-  background: var(--color-bg-dark-tertiary);
-  color: var(--color-text-dark-secondary);
-  border: 1px solid var(--color-border-dark);
+  background: #4891ff;
+  color: white;
 }
 
 /* ==================== LOGS ==================== */
@@ -399,10 +420,10 @@
   align-items: center;
   margin-bottom: var(--spacing-md);
   padding: var(--spacing-sm);
-  background: var(--color-bg-dark-tertiary);
+  background: var(--bg-tertiary);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
 }
 
 .log-entry {
@@ -410,14 +431,14 @@
   grid-template-columns: 80px 40px 1fr;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  background: var(--color-bg-dark-tertiary);
+  background: var(--bg-tertiary);
   border-radius: var(--radius-sm);
   margin-bottom: var(--spacing-sm);
   font-size: var(--font-size-xs);
 }
 
 .log-time {
-  color: var(--color-text-dark-muted);
+  color: var(--text-muted);
   font-family: var(--font-family-mono);
 }
 
@@ -439,7 +460,7 @@
 }
 
 .log-message {
-  color: var(--color-text-dark-secondary);
+  color: var(--text-secondary);
 }
 
 /* ==================== ANIMATIONS ==================== */
@@ -466,41 +487,48 @@
 }
 
 @media (max-width: 768px) {
+  .automatizaciones-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .workflows-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
     position: relative;
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
   }
 
   .workflows-header h1 {
     font-size: var(--font-size-xl);
     padding-right: 50px;
+    line-height: 1.3;
   }
 
   .workflows-header p {
-    font-size: 10px;
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
   }
 
   .refresh-metrics-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
+    display: none;
   }
 
   .workflows-stats {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
   }
 
   .workflows-stats .stat-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
 
   .workflows-stats .stat-icon {
-    font-size: 18px;
-    width: 36px;
-    height: 36px;
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
   }
 
   .workflows-stats .stat-info h3 {
@@ -508,72 +536,86 @@
   }
 
   .workflows-stats .stat-info p {
-    font-size: 10px;
+    font-size: var(--font-size-xs);
+    line-height: 1.4;
   }
 
   .workflows-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
   }
 
   .workflows-filters {
     overflow-x: auto;
-    gap: var(--spacing-xs);
-    padding-bottom: var(--spacing-xs);
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
   }
 
   .filter-btn {
-    font-size: 10px;
-    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
   }
 
   .workflow-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
 
   .workflow-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
 
   .workflow-title-group h3 {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
+    line-height: 1.4;
   }
 
   .workflow-badges {
     flex-direction: row;
     align-self: flex-start;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
   }
 
   .badge {
-    font-size: 9px;
-    padding: 3px 8px;
+    font-size: 12px;
+    padding: 4px 10px;
   }
 
   .workflow-category-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
   }
 
   .workflow-description {
-    font-size: 11px;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
     min-height: auto;
   }
 
   .workflow-metrics {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
   }
 
   .metric-label {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .metric-value {
     font-size: var(--font-size-base);
+  }
+
+  .workflow-actions {
+    margin-top: var(--spacing-lg);
+    justify-content: flex-end;
+  }
+
+  .workflow-actions .btn-modal {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    min-height: 44px;
   }
 
   .modal-overlay {
@@ -589,86 +631,242 @@
   .modal-header,
   .modal-body,
   .modal-footer {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
 
   .modal-header h2 {
     font-size: var(--font-size-lg);
+    line-height: 1.4;
   }
 
   .modal-footer {
-    flex-direction: column;
+    justify-content: flex-start;
   }
 
-  .btn-modal {
-    width: 100%;
+  .modal-footer .btn-modal {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    min-height: 44px;
+    width: auto;
+    flex: 0 0 auto;
   }
 
   .logs-info {
     flex-direction: column;
-    gap: var(--spacing-xs);
-    font-size: 10px;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-md);
   }
 
   .log-entry {
-    grid-template-columns: 50px 30px 1fr;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
-    font-size: 10px;
+    grid-template-columns: 80px 40px 1fr;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    font-size: var(--font-size-sm);
   }
 }
 
 @media (max-width: 480px) {
   .workflows-header h1 {
     font-size: var(--font-size-lg);
+    padding-right: 40px;
+    line-height: 1.3;
+  }
+
+  .workflows-header p {
+    font-size: 12px;
+    line-height: 1.5;
   }
 
   .refresh-metrics-btn {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
+    display: none;
+  }
+
+  .workflows-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .stat-card {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .stat-info h3 {
+    font-size: var(--font-size-lg);
+  }
+
+  .stat-info p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .workflows-filters {
+    gap: var(--spacing-xs);
+  }
+
+  .filter-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 12px;
+    min-height: 44px;
+  }
+
+  .workflows-grid {
+    gap: var(--spacing-md);
   }
 
   .workflow-card {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+
+  .workflow-header {
+    gap: var(--spacing-sm);
   }
 
   .workflow-category-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .workflow-category-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .workflow-title-group {
+    gap: var(--spacing-sm);
   }
 
   .workflow-title-group h3 {
     font-size: 13px;
+    line-height: 1.4;
   }
 
   .workflow-id {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .badge {
-    font-size: 8px;
-    padding: 2px 6px;
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .workflow-description {
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+    min-height: auto;
+  }
+
+  .workflow-executing {
+    font-size: 12px;
+    padding: var(--spacing-sm);
   }
 
   .workflow-metrics {
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
-  .modal-header,
-  .modal-body,
+  .metric-label {
+    font-size: 12px;
+  }
+
+  .metric-value {
+    font-size: 13px;
+  }
+
+  .workflow-progress {
+    margin-top: var(--spacing-sm);
+  }
+
+  .progress-bar {
+    height: 4px;
+  }
+
+  .workflow-actions {
+    margin-top: var(--spacing-md);
+    justify-content: flex-end;
+  }
+
+  .workflow-actions .btn-modal {
+    font-size: 12px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 44px;
+  }
+
+  .modal-content {
+    width: 95%;
+  }
+
+  .modal-header {
+    padding: var(--spacing-md);
+  }
+
+  .modal-header h2 {
+    font-size: var(--font-size-base);
+    line-height: 1.4;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+  }
+
+  .modal-close svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .modal-body {
+    padding: var(--spacing-md);
+  }
+
   .modal-footer {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+    justify-content: flex-start;
+  }
+
+  .modal-footer .btn-modal {
+    font-size: 12px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 36px;
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .logs-info {
     padding: var(--spacing-sm);
+    font-size: 11px;
+    line-height: 1.5;
   }
 
   .log-entry {
     grid-template-columns: 1fr;
-    gap: 2px;
-    text-align: left;
-    font-size: 9px;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    font-size: 12px;
+    line-height: 1.5;
   }
 
   .log-time {
     font-weight: var(--font-weight-semibold);
+    font-size: 11px;
+  }
+
+  .log-message {
+    font-size: 12px;
+    line-height: 1.5;
   }
 }

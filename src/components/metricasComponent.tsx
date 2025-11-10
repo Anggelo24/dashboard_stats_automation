@@ -2,20 +2,32 @@ import React, { useState, useEffect } from "react";
 import "../style/metricas.css";
 import {
   RefreshCcw,
+  MessageSquare,
+  Phone,
+  ClipboardCheck,
+  ShoppingBag,
+  ShoppingCart,
+  MessageCircle,
   Zap,
   CheckCircle,
   XCircle,
-  Clock,
   TrendingUp,
   Activity,
   Loader,
   AlertCircle,
+  Users,
+  Trophy,
+  BarChart3,
+  Clock,
 } from "lucide-react";
-import { n8nService } from "../services/n8nservices";
-import type { DashboardMetrics } from "../services/n8nservices";
+import { supabaseService } from "../services/supabaseService.ts";
+import type { BusinessMetrics } from "../services/supabaseService.ts";
+
+// ⚠️ REEMPLAZA CON TU UUID REAL DE FLUFFY DESDE SUPABASE
+const FLUFFY_CLIENT_ID = "2e75e60c-2362-42d1-8300-225944efb8db";
 
 function MetricasCom() {
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [metrics, setMetrics] = useState<BusinessMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -23,7 +35,7 @@ function MetricasCom() {
   const fetchMetrics = async () => {
     try {
       setError(null);
-      const response = await n8nService.getDashboardMetrics();
+      const response = await supabaseService.getBusinessMetrics(FLUFFY_CLIENT_ID, 7);
 
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Error al cargar métricas');
@@ -67,7 +79,7 @@ function MetricasCom() {
       <div className="metricas-container">
         <div className="metrics-loading">
           <Loader size={48} className="spinner" />
-          <p>Cargando métricas del dashboard...</p>
+          <p>Cargando métricas del negocio...</p>
         </div>
       </div>
     );
@@ -88,20 +100,19 @@ function MetricasCom() {
     );
   }
 
-  // Preparar datos del timeline para los últimos 7 días
-  const timelineData = Object.entries(metrics.timeline).map(([date, data]) => ({
-    date,
-    ...data,
-  }));
+  // Preparar datos del timeline
+  const timelineData = Object.entries(metrics.timeline)
+    .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+    .map(([date, data]) => ({ date, ...data }));
 
   return (
     <div className="metricas-container-wrapper">
       {/* Header */}
       <div className="dashboard-header">
         <div className="header-content">
-          <h1 className="dashboard-title">Dashboard de Métricas</h1>
+          <h1 className="dashboard-title">Resumen del negocio Fluffy</h1>
           <p className="last-update">
-            Última actualización: {formatDate(metrics.lastUpdate)}
+            Actividad de tu negocio en tiempo real. Última actualización: {new Date().toLocaleString('es-ES')}
           </p>
         </div>
         <button
@@ -109,45 +120,32 @@ function MetricasCom() {
           onClick={handleRefresh}
           disabled={refreshing}
         >
-          <RefreshCcw className={refreshing ? 'spinning' : ''} />
+          <RefreshCcw size={16} className={refreshing ? 'spinning' : ''} />
         </button>
       </div>
 
       <div className="dashboard-sections">
-        {/* Main Metrics Cards */}
+        {/* Main Summary Cards */}
         <div className="metricas-container">
           <div className="bloque-Metricas">
             <div className="metrica-icon" style={{ backgroundColor: '#3b82f6' }}>
-              <Zap size={24} />
+              <Activity size={24} />
             </div>
             <div className="metrica-content">
-              <h3 className="metrica-value">{metrics.workflows.total}</h3>
-              <p className="metrica-label">Total Workflows</p>
-              <span className="metrica-badge">
-                {metrics.workflows.active} activos
-              </span>
+              <h3 className="metrica-value">{metrics.summary.totalEvents}</h3>
+              <p className="metrica-label">Eventos Totales</p>
+              <span className="metrica-badge">Últimos 7 días</span>
             </div>
           </div>
 
           <div className="bloque-Metricas">
             <div className="metrica-icon" style={{ backgroundColor: '#10b981' }}>
-              <CheckCircle size={24} />
+              <Users size={24} />
             </div>
             <div className="metrica-content">
-              <h3 className="metrica-value">{metrics.executions.successful}</h3>
-              <p className="metrica-label">Ejecuciones Exitosas</p>
-              <span className="metrica-badge">Últimos 7 días</span>
-            </div>
-          </div>
-
-          <div className="bloque-Metricas">
-            <div className="metrica-icon" style={{ backgroundColor: '#ef4444' }}>
-              <XCircle size={24} />
-            </div>
-            <div className="metrica-content">
-              <h3 className="metrica-value">{metrics.executions.failed}</h3>
-              <p className="metrica-label">Ejecuciones Fallidas</p>
-              <span className="metrica-badge">Últimos 7 días</span>
+              <h3 className="metrica-value">{metrics.summary.uniqueContacts}</h3>
+              <p className="metrica-label">Contactos Únicos</p>
+              <span className="metrica-badge">Clientes alcanzados</span>
             </div>
           </div>
 
@@ -156,105 +154,257 @@ function MetricasCom() {
               <TrendingUp size={24} />
             </div>
             <div className="metrica-content">
-              <h3 className="metrica-value">{metrics.executions.successRate}%</h3>
+              <h3 className="metrica-value">{metrics.summary.successRate}%</h3>
               <p className="metrica-label">Tasa de Éxito</p>
-              <span className="metrica-badge">Promedio general</span>
+              <span className="metrica-badge">Automatizaciones</span>
+            </div>
+          </div>
+
+          <div className="bloque-Metricas">
+            <div className="metrica-icon" style={{ backgroundColor: '#f59e0b' }}>
+              <Zap size={24} />
+            </div>
+            <div className="metrica-content">
+              <h3 className="metrica-value">{metrics.summary.last24Hours}</h3>
+              <p className="metrica-label">Últimas 24 Horas</p>
+              <span className="metrica-badge">Actividad reciente</span>
             </div>
           </div>
         </div>
 
-        {/* Execution Stats */}
+        {/* Business Metrics Row 1 */}
         <div className="graficas-row">
-          <div className="bloque-GraficaUno">
-            <div className="grafica-header">
-              <h3>📊 Estadísticas de Ejecución</h3>
-              <span className="live-badge">Últimos 7 días</span>
+          {/* WhatsApp Card */}
+          {metrics.metrics.whatsapp && (
+            <div className="bloque-GraficaUno">
+              <div className="grafica-header">
+                <h3>
+                  <MessageSquare size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                  WhatsApp
+                </h3>
+                <span className="live-badge">Últimos 7 días</span>
+              </div>
+              <div className="execution-stats">
+                <div className="stat-box">
+                  <div className="stat-number">{metrics.metrics.whatsapp.sent}</div>
+                  <div className="stat-label">Enviados</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-number" style={{ color: '#10b981' }}>
+                    {metrics.metrics.whatsapp.delivered}
+                  </div>
+                  <div className="stat-label">Entregados</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-number" style={{ color: '#3b82f6' }}>
+                    {metrics.metrics.whatsapp.read}
+                  </div>
+                  <div className="stat-label">Leídos</div>
+                </div>
+              </div>
             </div>
-            <div className="execution-stats">
-              <div className="stat-box">
-                <div className="stat-number">{metrics.executions.total}</div>
-                <div className="stat-label">Total</div>
-              </div>
-              <div className="stat-box">
-                <div className="stat-number" style={{ color: '#10b981' }}>
-                  {metrics.executions.successful}
-                </div>
-                <div className="stat-label">Exitosas</div>
-              </div>
-              <div className="stat-box">
-                <div className="stat-number" style={{ color: '#ef4444' }}>
-                  {metrics.executions.failed}
-                </div>
-                <div className="stat-label">Fallidas</div>
-              </div>
-              <div className="stat-box">
-                <div className="stat-number" style={{ color: '#f59e0b' }}>
-                  {metrics.executions.running}
-                </div>
-                <div className="stat-label">Ejecutando</div>
-              </div>
-            </div>
-          </div>
+          )}
 
-          <div className="bloque-GraficaDos">
-            <div className="grafica-header">
-              <h3>⚡ Rendimiento</h3>
-            </div>
-            <div className="performance-content">
-              <div className="perf-metric">
-                <div className="perf-label">Tasa de Éxito</div>
-                <div className="perf-value">{metrics.executions.successRate}%</div>
-                <div className="perf-bar">
-                  <div
-                    className="perf-fill success-fill"
-                    style={{ width: `${metrics.executions.successRate}%` }}
-                  ></div>
-                </div>
+          {/* Calls Card */}
+          {metrics.metrics.calls && (
+            <div className="bloque-GraficaDos">
+              <div className="grafica-header">
+                <h3>
+                  <Phone size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                  Llamadas
+                </h3>
               </div>
-
-              <div className="perf-metric">
-                <div className="perf-label">Tiempo Promedio de Ejecución</div>
-                <div className="perf-value">{metrics.executions.avgExecutionTime}s</div>
-                <div className="perf-bar">
-                  <div
-                    className="perf-fill"
-                    style={{ width: '75%' }}
-                  ></div>
+              <div className="performance-content">
+                <div className="perf-metric">
+                  <div className="perf-label">Llamadas Realizadas</div>
+                  <div className="perf-value">{metrics.metrics.calls.made}</div>
+                  <div className="perf-bar">
+                    <div className="perf-fill" style={{ width: '100%' }}></div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="perf-metric">
-                <div className="perf-label">Workflows Activos</div>
-                <div className="perf-value">
-                  {metrics.workflows.active}/{metrics.workflows.total}
+                <div className="perf-metric">
+                  <div className="perf-label">Contestadas</div>
+                  <div className="perf-value">{metrics.metrics.calls.answered}</div>
+                  <div className="perf-bar">
+                    <div
+                      className="perf-fill success-fill"
+                      style={{ width: `${(metrics.metrics.calls.answered / metrics.metrics.calls.made) * 100}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="perf-bar">
-                  <div
-                    className="perf-fill"
-                    style={{
-                      width: `${(metrics.workflows.active / metrics.workflows.total) * 100}%`,
-                    }}
-                  ></div>
+
+                <div className="perf-metric">
+                  <div className="perf-label">Duración Promedio</div>
+                  <div className="perf-value">{metrics.metrics.calls.avgDuration}</div>
+                  <div className="perf-bar">
+                    <div className="perf-fill" style={{ width: '75%' }}></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+        </div>
+
+        {/* Business Metrics Row 2 */}
+        <div className="graficas-row">
+          {/* Surveys Card */}
+          {metrics.metrics.surveys && (
+            <div className="bloque-GraficaTres">
+              <div className="grafica-header">
+                <h3>
+                  <ClipboardCheck size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                  Encuestas
+                </h3>
+              </div>
+              <div className="timeline-content">
+                <div className="perf-metric" style={{ marginBottom: '1rem' }}>
+                  <div className="perf-label">Encuestas Enviadas</div>
+                  <div className="perf-value">{metrics.metrics.surveys.sent}</div>
+                </div>
+                <div className="perf-metric" style={{ marginBottom: '1rem' }}>
+                  <div className="perf-label">Completadas</div>
+                  <div className="perf-value" style={{ color: '#10b981' }}>
+                    {metrics.metrics.surveys.completed}
+                  </div>
+                </div>
+                <div className="perf-metric">
+                  <div className="perf-label">Tasa de Completado</div>
+                  <div className="perf-value">{metrics.metrics.surveys.completionRate}%</div>
+                  <div className="perf-bar">
+                    <div
+                      className="perf-fill success-fill"
+                      style={{ width: `${metrics.metrics.surveys.completionRate}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sales Card */}
+          {metrics.metrics.sales && (
+            <div className="bloque-GraficaCuatro">
+              <div className="grafica-header">
+                <h3>
+                  <ShoppingBag size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                  Ventas
+                </h3>
+                <span className="count-badge">
+                  {metrics.metrics.sales.registered}
+                </span>
+              </div>
+              <div className="performance-content">
+                <div className="perf-metric">
+                  <div className="perf-label">Ventas Registradas</div>
+                  <div className="perf-value">{metrics.metrics.sales.registered}</div>
+                </div>
+
+                <div className="perf-metric">
+                  <div className="perf-label">Ingresos Totales</div>
+                  <div className="perf-value" style={{ color: '#10b981' }}>
+                    ${metrics.metrics.sales.totalRevenue.toFixed(2)}
+                  </div>
+                </div>
+
+                <div className="perf-metric">
+                  <div className="perf-label">Ticket Promedio</div>
+                  <div className="perf-value">${metrics.metrics.sales.avgOrderValue.toFixed(2)}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Business Metrics Row 3 */}
+        <div className="graficas-row">
+          {/* Abandoned Cart Card */}
+          {metrics.metrics.abandonedCart && (
+            <div className="bloque-GraficaUno">
+              <div className="grafica-header">
+                <h3>
+                  <ShoppingCart size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                  Carritos Abandonados
+                </h3>
+              </div>
+              <div className="execution-stats">
+                <div className="stat-box">
+                  <div className="stat-number">{metrics.metrics.abandonedCart.contacted}</div>
+                  <div className="stat-label">Contactados</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-number" style={{ color: '#10b981' }}>
+                    {metrics.metrics.abandonedCart.recovered}
+                  </div>
+                  <div className="stat-label">Recuperados</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-number" style={{ color: '#8b5cf6' }}>
+                    {metrics.metrics.abandonedCart.recoveryRate}%
+                  </div>
+                  <div className="stat-label">Tasa</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* AI Comments Card */}
+          {metrics.metrics.aiComments && (
+            <div className="bloque-GraficaDos">
+              <div className="grafica-header">
+                <h3>
+                  <MessageCircle size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                  Community Manager AI
+                </h3>
+              </div>
+              <div className="performance-content">
+                <div className="perf-metric">
+                  <div className="perf-label">Comentarios Procesados</div>
+                  <div className="perf-value">{metrics.metrics.aiComments.processed}</div>
+                  <div className="perf-bar">
+                    <div className="perf-fill" style={{ width: '100%' }}></div>
+                  </div>
+                </div>
+
+                <div className="perf-metric">
+                  <div className="perf-label">Respuestas Públicas</div>
+                  <div className="perf-value">{metrics.metrics.aiComments.replied}</div>
+                  <div className="perf-bar">
+                    <div
+                      className="perf-fill success-fill"
+                      style={{ width: `${(metrics.metrics.aiComments.replied / metrics.metrics.aiComments.processed) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="perf-metric">
+                  <div className="perf-label">DMs Enviados</div>
+                  <div className="perf-value">{metrics.metrics.aiComments.dmsSent}</div>
+                  <div className="perf-bar">
+                    <div
+                      className="perf-fill"
+                      style={{ width: `${(metrics.metrics.aiComments.dmsSent / metrics.metrics.aiComments.processed) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Timeline */}
         <div className="graficas-row">
           <div className="bloque-GraficaTres">
             <div className="grafica-header">
-              <h3>📈 Línea de Tiempo (7 días)</h3>
+              <h3>
+                <TrendingUp size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                Actividad Diaria (7 días)
+              </h3>
             </div>
             <div className="timeline-content">
               {timelineData.map((day) => {
-                const successWidth = day.total > 0
-                  ? (day.success / day.total) * 100
-                  : 0;
-                const failedWidth = day.total > 0
-                  ? (day.failed / day.total) * 100
-                  : 0;
+                const successWidth = day.total > 0 ? (day.success / day.total) * 100 : 0;
+                const failedWidth = day.total > 0 ? (day.failed / day.total) * 100 : 0;
 
                 return (
                   <div key={day.date} className="timeline-day">
@@ -287,38 +437,37 @@ function MetricasCom() {
             </div>
           </div>
 
-          {/* Top Workflows */}
+          {/* Recent Activity */}
           <div className="bloque-GraficaCuatro">
             <div className="grafica-header">
-              <h3>🏆 Top Workflows</h3>
-              <span className="count-badge">
-                {metrics.topWorkflows.length} workflows
-              </span>
+              <h3>
+                <Trophy size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                Actividad Reciente
+              </h3>
+              <span className="count-badge">{metrics.recentActivity.length}</span>
             </div>
             <div className="workflow-list">
-              {metrics.topWorkflows.length > 0 ? (
-                metrics.topWorkflows.map((workflow, index) => (
-                  <div key={workflow.id} className="workflow-item">
-                    <div className="workflow-rank">#{index + 1}</div>
-                    <div className="workflow-info">
-                      <strong>{workflow.name}</strong>
-                      <div className="workflow-stats">
-                        {workflow.count} ejecuciones
-                      </div>
-                    </div>
-                    <div className={`workflow-status ${workflow.active ? 'active' : 'inactive'}`}>
-                      {workflow.active ? (
-                        <CheckCircle size={20} />
+              {metrics.recentActivity.length > 0 ? (
+                metrics.recentActivity.slice(0, 5).map((activity) => (
+                  <div key={activity.id} className="workflow-item">
+                    <div className={`workflow-status ${activity.status === 'success' ? 'active' : 'inactive'}`}>
+                      {activity.status === 'success' ? (
+                        <CheckCircle size={16} />
                       ) : (
-                        <XCircle size={20} />
+                        <XCircle size={16} />
                       )}
                     </div>
-                    <div className="workflow-count">{workflow.count}</div>
+                    <div className="workflow-info">
+                      <strong>{activity.eventType}</strong>
+                      <div className="workflow-stats">
+                        {formatDate(activity.timestamp)}
+                      </div>
+                    </div>
                   </div>
                 ))
               ) : (
                 <div className="no-data">
-                  <p>No hay datos de ejecuciones en los últimos 7 días</p>
+                  <p>No hay actividad reciente</p>
                 </div>
               )}
             </div>
@@ -328,48 +477,53 @@ function MetricasCom() {
         {/* Summary Stats */}
         <div className="bloque-Side">
           <div className="grafica-header">
-            <h3>📊 Resumen General</h3>
+            <h3>
+              <BarChart3 size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+              Resumen General
+            </h3>
           </div>
           <div className="stats-summary">
             <div className="summary-item">
               <Activity className="summary-icon" />
               <div className="summary-data">
-                <div className="summary-value">{metrics.workflows.total}</div>
-                <div className="summary-label">Workflows Configurados</div>
+                <div className="summary-value">{metrics.summary.totalEvents}</div>
+                <div className="summary-label">Eventos Totales (7d)</div>
               </div>
             </div>
 
             <div className="summary-item">
-              <CheckCircle className="summary-icon" style={{ color: '#10b981' }} />
+              <Users className="summary-icon" style={{ color: '#10b981' }} />
               <div className="summary-data">
-                <div className="summary-value">{metrics.workflows.active}</div>
-                <div className="summary-label">Workflows Activos</div>
-              </div>
-            </div>
-
-            <div className="summary-item">
-              <Clock className="summary-icon" style={{ color: '#f59e0b' }} />
-              <div className="summary-data">
-                <div className="summary-value">{metrics.workflows.paused}</div>
-                <div className="summary-label">Workflows Pausados</div>
-              </div>
-            </div>
-
-            <div className="summary-item">
-              <Zap className="summary-icon" style={{ color: '#3b82f6' }} />
-              <div className="summary-data">
-                <div className="summary-value">{metrics.executions.total}</div>
-                <div className="summary-label">Ejecuciones Totales (7d)</div>
+                <div className="summary-value">{metrics.summary.uniqueContacts}</div>
+                <div className="summary-label">Contactos Únicos</div>
               </div>
             </div>
 
             <div className="summary-item">
               <TrendingUp className="summary-icon" style={{ color: '#8b5cf6' }} />
               <div className="summary-data">
-                <div className="summary-value">{metrics.executions.successRate}%</div>
-                <div className="summary-label">Tasa de Éxito Promedio</div>
+                <div className="summary-value">{metrics.summary.successRate}%</div>
+                <div className="summary-label">Tasa de Éxito</div>
               </div>
             </div>
+
+            <div className="summary-item">
+              <Zap className="summary-icon" style={{ color: '#f59e0b' }} />
+              <div className="summary-data">
+                <div className="summary-value">{metrics.summary.last24Hours}</div>
+                <div className="summary-label">Últimas 24 Horas</div>
+              </div>
+            </div>
+
+            {metrics.metrics.sales && (
+              <div className="summary-item">
+                <ShoppingBag className="summary-icon" style={{ color: '#10b981' }} />
+                <div className="summary-data">
+                  <div className="summary-value">${metrics.metrics.sales.totalRevenue.toFixed(2)}</div>
+                  <div className="summary-label">Ingresos Totales</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

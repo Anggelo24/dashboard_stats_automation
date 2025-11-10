@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import '../style/confirmation-modal.css';
 
 interface ConfirmationModalProps {
@@ -25,9 +26,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   if (!isOpen) return null;
 
   const iconMap = {
-    warning: '⚠️',
-    danger: '🚨',
-    info: 'ℹ️'
+    warning: <AlertTriangle size={24} />,
+    danger: <AlertCircle size={24} />,
+    info: <Info size={24} />
   };
 
   return (

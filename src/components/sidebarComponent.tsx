@@ -5,7 +5,8 @@ import { MdOutlineBusinessCenter, MdOutlineSupportAgent } from "react-icons/md";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { FaRegFileLines } from "react-icons/fa6";
 import { RiRobot2Line } from "react-icons/ri";
-import { HiMenuAlt3, HiX } from "react-icons/hi";
+import { PanelRightOpen, X } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 import "../style/sidebar.css";
 
 const Sidebar = () => {
@@ -36,7 +37,7 @@ const Sidebar = () => {
         onClick={toggleSidebar}
         aria-label="Toggle menu"
       >
-        {isOpen ? <HiX /> : <HiMenuAlt3 />}
+        {isOpen ? <X /> : <PanelRightOpen />}
       </button>
 
       {/* Overlay for mobile */}
@@ -65,9 +66,11 @@ const Sidebar = () => {
           ))}
         </nav>
 
+        <ThemeToggle />
+
         <div className="sidebar-footer">
           <p className="sidebar-footer-text">
-            By <span className="tuinity-brand">TuinityAI</span>
+            <span className="tuinity-brand">Tuinity</span>
           </p>
         </div>
       </div>
