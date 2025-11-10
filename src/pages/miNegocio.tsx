@@ -56,9 +56,6 @@ const MiNegocioDashboard = () => {
                 : "Completa tu información para que podamos desarrollar la mejor solución para ti."}
             </p>
           </div>
-          <div className="header-badge">
-            <span className="client-id">ID: {CLIENTE_CONFIG.clienteId}</span>
-          </div>
         </div>
 
         {isCompleted ? (
