@@ -20,16 +20,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-2xl);
-  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-2xl);
+  margin-bottom: var(--spacing-sm);
   border-bottom: 1px solid var(--border-color);
   text-align: center;
 }
 
 .sidebar-logo-container img {
   width: 120px;
-  margin-top: var(--spacing-2xl);
-  margin-bottom: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 /* ==================== NAVIGATION ==================== */
@@ -106,23 +106,32 @@
 
 .sidebar-footer-text {
   font-size: var(--font-size-xs);
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(136, 136, 136, 0.338);  /* Default: muted gray for dark mode */
   font-weight: 600;
   margin: 0;
-}
-
-
-.tuinity-brand {
-  font-family: 'Glitz', sans-serif !important;  /* ← Agrega comillas */
-  font-weight: normal !important;  /* ← CAMBIA A NORMAL */
-  font-size: x-large;
-  color: rgba(136, 136, 136, 0.338) !important;  /* Light gray for dark mode */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.3s ease;
 }
 
-/* Light mode: keep dark gray */
-:root[data-theme="light"] .tuinity-brand {
-  color: rgba(0, 0, 0, 0.35);
+/* Light mode: darker gray */
+:root[data-theme="light"] .sidebar-footer-text {
+  color: rgba(0, 0, 0, 0.168);
+}
+
+/* Tuinity brand text (currently commented out in component) */
+.tuinity-brand {
+  font-family: 'Glitz', sans-serif !important;
+  font-weight: normal !important;
+  font-size: x-large;
+  transition: color 0.3s ease;
+}
+
+/* Quimera logo - responsive sizing */
+.quimera-logo {
+  height: 32px;
+  width: auto;
 }
 
 /* ==================== MOBILE ==================== */
@@ -174,6 +183,11 @@
     width: 18px;
     height: 18px;
   }
+
+  .quimera-logo {
+    height: 24px;
+    width: auto;
+  }
 }
 
 @media (max-width: 768px) {
@@ -215,6 +229,11 @@
 
   .sidebar-nav {
     max-height: calc(100vh - 280px);
+  }
+
+  .quimera-logo {
+    height: 24px;
+    width: auto;
   }
 }
 
@@ -262,6 +281,11 @@
 
   .sidebar-nav {
     max-height: calc(100vh - 250px);
+  }
+
+  .quimera-logo {
+    height: 20px;
+    width: auto;
   }
 }
 

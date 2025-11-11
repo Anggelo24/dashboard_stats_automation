@@ -49,7 +49,11 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="sidebar-logo-container">
-          <img style={{width: '100px', marginTop: '50px', marginBottom: '20px'}} src="https://res.cloudinary.com/db3espoei/image/upload/v1761193211/imagen_2025-10-22_230620072-removebg-preview_mo1hss.png" alt="Logo" />
+          <img
+            style={{width: '140px'}}
+            src="https://res.cloudinary.com/db3espoei/image/upload/v1762833053/Mesa_de_trabajo_24x_sdsqs2.png"
+            alt="Fluffy Logo"
+          />
         </div>
 
         <nav className="sidebar-nav">
@@ -70,7 +74,26 @@ const Sidebar = () => {
 
         <div className="sidebar-footer">
           <p className="sidebar-footer-text">
-            <span className="tuinity-brand">Tuinity</span>
+            <span
+              className="quimera-logo"
+              style={{
+                display: 'inline-block',
+                height: '32px',
+                aspectRatio: '3333/1117',
+                WebkitMaskImage: 'url(https://res.cloudinary.com/db3espoei/image/upload/v1762875563/Mesa_de_trabajo_24x_1_dp5flc.svg)',
+                WebkitMaskSize: 'contain',
+                WebkitMaskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskImage: 'url(https://res.cloudinary.com/db3espoei/image/upload/v1762875563/Mesa_de_trabajo_24x_1_dp5flc.svg)',
+                maskSize: 'contain',
+                maskRepeat: 'no-repeat',
+                maskPosition: 'center',
+                backgroundColor: 'currentColor',
+                verticalAlign: 'middle'
+              }}
+              aria-label="Quimera Tuinity"
+            />
+            {/* <span className="tuinity-brand">Tuinity</span> */}
           </p>
         </div>
       </div>
